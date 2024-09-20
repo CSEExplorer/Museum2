@@ -144,27 +144,20 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-
-
 import environ
-import os
 
-# Initialize the environment variables
+# Initialize environment variables
 env = environ.Env()
+environ.Env.read_env()  # Read the .env file
 
-# Define the path to the .env file
-env_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.env')
-env.read_env(env_file_path)
+TWILIO_ACCOUNT_SID="AC8ef9c19e395fd386a22afba4edae3a64"
+TWILIO_AUTH_TOKEN="fb5768775777b19808b9ee0cfa6d3101"
+TWILIO_PHONE_NUMBER="+15005550006"
 
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST= "smtp.gmail.com"
+EMAIL_USE_TLS="True"
+EMAIL_PORT=587
+EMAIL_HOST_USER="saxenaaditya381@gmail.com"
+EMAIL_HOST_PASSWORD="jqof qptb ewgw gkgg"
 
-
-
-
-# Email Configuration
-EMAIL_BACKEND = env("EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend")
-EMAIL_HOST = env("EMAIL_HOST", default="smtp.gmail.com")
-EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
-EMAIL_PORT = env.int("EMAIL_PORT", default=587)
-EMAIL_HOST_USER = env("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
