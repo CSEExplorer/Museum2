@@ -144,15 +144,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-import environ
 
-# Initialize environment variables
-env = environ.Env()
-environ.Env.read_env()  # Read the .env file
-
-TWILIO_ACCOUNT_SID="AC8ef9c19e395fd386a22afba4edae3a64"
-TWILIO_AUTH_TOKEN="fb5768775777b19808b9ee0cfa6d3101"
-TWILIO_PHONE_NUMBER="+15005550006"
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST= "smtp.gmail.com"
