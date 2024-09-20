@@ -1,0 +1,30 @@
+# Python-related
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+
+# Environment variables
+.env
+
+# Database files
+*.sqlite3
+*.db
+
+# Logs
+*.log
+
+# IDE-specific files
+.vscode/
+.idea/
+*.sublime-workspace
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
