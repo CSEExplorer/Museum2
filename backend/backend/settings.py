@@ -25,8 +25,11 @@ SECRET_KEY = 'django-insecure-x2zu$(fzata(k1=2*8-5#@mwxy_(@a(wkio6cg*z8i2q)r32+a
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = [
+    'localhost',  # Allow localhost for local development
+    '127.0.0.1',  # Allow localhost IP
+    'museum-rr68.onrender.com',  # Add your Render domain
+]
 
 # Application definition
 
@@ -63,7 +66,8 @@ ROOT_URLCONF = 'backend.urls'
 CORS_ALLOW_ALL_ORIGINS = True 
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # React development server
+    "http://localhost:3000",
+    # React development server
 ]
 
 TEMPLATES = [
