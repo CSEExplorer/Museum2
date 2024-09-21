@@ -6,7 +6,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
+const apiUrl = process.env.REACT_APP_API_URL; 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -44,7 +44,7 @@ const Login = () => {
         if (isOtpStep) {
             // Handle OTP verification
             try {
-                const response = await axios.post('http://localhost:8000/api/verify_otp/', {
+                const response = await axios.post(`${apiUrl}/verify_otp/`, {
                     otp: otp,
                     email: email  // Send email along with OTP for verification
                 });
@@ -58,7 +58,7 @@ const Login = () => {
         } else {
             // Handle initial login
             try {
-                const response = await axios.post('http://localhost:8000/api/login/', {
+                const response = await axios.post(`${apiUrl}/login/`, {
                     username: email,
                     password: password
                 });
