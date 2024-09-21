@@ -1,0 +1,17 @@
+{
+  "files": {
+    "main.css": "/static/css/main.d221dc40.css",
+    "main.js": "/static/js/main.eb63dd88.js",
+    "static/media/Logo.jpg": "/static/media/Logo.360335947fd9213d735e.jpg",
+    "static/media/museum3.jpg": "/static/media/museum3.20205b5fe402c1ac4762.jpg",
+    "static/media/advert4.jpg": "/static/media/advert4.a100f146c37a00a437b9.jpg",
+    "static/media/museum1.jpg": "/static/media/museum1.aeae2b12613342ddaad7.jpg",
+    "index.html": "/index.html",
+    "main.d221dc40.css.map": "/static/css/main.d221dc40.css.map",
+    "main.eb63dd88.js.map": "/static/js/main.eb63dd88.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.d221dc40.css",
+    "static/js/main.eb63dd88.js"
+  ]
+}
