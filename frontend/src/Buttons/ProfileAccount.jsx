@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-const BASE_URL = 'http://localhost:8000';
+const BASE_URL = 'https://museum-rr68.onrender.com';
+const apiUrl = process.env.REACT_APP_API_URL; 
 const ProfileAccount = () => {
     const [userDetails, setUserDetails] = useState({
         username: '',
@@ -25,7 +26,7 @@ const ProfileAccount = () => {
                     setError('User is not authenticated');
                     return;
                 }
-                const response = await axios.get('http://localhost:8000/api/user/profile/', {
+                const response = await axios.get(`${apiUrl}/user/profile/`, {
                     headers: {
                         Authorization: `Token ${token}`,
                     },
@@ -78,7 +79,7 @@ const ProfileAccount = () => {
                 data.append('profile_image', selectedImage);
             }
 
-            await axios.put('http://localhost:8000/api/user/profile/', data, {
+            await axios.put(`${apiUrl}/user/profile/`, data,{
                 headers: {
                     Authorization: `Token ${token}`,
                     'Content-Type': 'multipart/form-data'

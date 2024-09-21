@@ -3,8 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FaUserCircle } from 'react-icons/fa'; // Import profile icon
 import Logo from '../Buttons/Logo.jpg'; // Corrected path and extension
 import axios from 'axios';
-
-const BASE_URL = 'http://localhost:8000';
+const apiUrl = process.env.REACT_APP_API_URL; 
+const BASE_URL = 'https://museum-rr68.onrender.com';
 
 const Header = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -19,7 +19,7 @@ const Header = () => {
       const token = localStorage.getItem('token'); // Adjust token storage based on your auth logic
       if (token) {
         try {
-          const response = await axios.get('http://localhost:8000/api/user/profile/', {
+          const response = await axios.get(`${apiUrl}/profile/`, {
             headers: { Authorization: `Token ${token}` },
           });
           setProfileImage(`${BASE_URL}${response.data.profile_image}`); // Update with your actual API structure
@@ -80,7 +80,7 @@ const Header = () => {
       }
 
       // Make the logout request
-      await axios.post('http://localhost:8000/api/logout/', null, {
+      await axios.post(`${apiUrl}/logout/`, null, {
         headers: {
           Authorization: `Token ${token}`,  // Get token from local storage
         },
