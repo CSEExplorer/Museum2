@@ -4,7 +4,6 @@ from django.contrib.auth import get_user_model,authenticate,login,logout
 
 # ---------------------------------------------SIGNUP--------------------------------------------------------------------
 
-# views.py
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
@@ -20,18 +19,15 @@ def signup(request):
         serializer = SignUpSerializer(data=data)
 
         if serializer.is_valid():
-            validated_data = serializer.validated_data
             try:
-                user = User.objects.create_user(
-                    username=validated_data['username'],
-                    email=validated_data['email'],
-                    password=validated_data['password']
-                )
+                # Save the user and user profile
+                serializer.save()
                 return JsonResponse({'message': 'User created successfully!'}, status=201)
             except Exception as e:
                 return JsonResponse({'error': str(e)}, status=400)
         else:
             return JsonResponse({'errors': serializer.errors}, status=400)
+
 
 # ---------------------------------------------LOGIN --------------------------------------------------------------------
 

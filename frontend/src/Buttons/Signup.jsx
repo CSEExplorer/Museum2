@@ -2,16 +2,23 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 const apiUrl = process.env.REACT_APP_API_URL; 
+
 const Signup = () => {
+    // State variables for form fields
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [phone, setPhone] = useState(''); // Added phone state
+    const [address, setAddress] = useState(''); // Added address state
+    const [city, setCity] = useState(''); // Added city state
+    const [state, setState] = useState(''); // Added state state
     const [message, setMessage] = useState('');
     const [errors, setErrors] = useState({});
 
     const navigate = useNavigate(); // Hook for navigation
 
+    // Styles for the form container and buttons
     const containerStyle = {
         maxWidth: '400px',
         margin: '0 auto',
@@ -36,20 +43,27 @@ const Signup = () => {
         backgroundColor: '#0056b3'
     };
 
+    // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
         setErrors({}); // Clear previous errors
 
+        // Check if passwords match
         if (password !== confirmPassword) {
             setErrors({ ...errors, password: 'Passwords do not match' });
             return;
         }
 
         try {
+            // API request to signup endpoint
             const response = await axios.post(`${apiUrl}/signup/`, {
                 username: name,
                 email: email,
-                password: password
+                password: password,
+                phone: phone, // Include phone in API request
+                address: address, // Include address in API request
+                city: city, // Include city in API request
+                state: state // Include state in API request
             });
             setMessage('Signup successful! You can now log in.');
             setErrors({});
@@ -118,6 +132,55 @@ const Signup = () => {
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                     />
+                </div>
+                {/* New fields added */}
+                <div className="mb-3">
+                    <label htmlFor="exampleInputPhone" className="form-label">Phone Number</label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        id="exampleInputPhone"
+                        placeholder="Enter your phone number"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                    />
+                    {errors.phone && <p className="error">{errors.phone}</p>}
+                </div>
+                <div className="mb-3">
+                    <label htmlFor="exampleInputAddress" className="form-label">Address</label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        id="exampleInputAddress"
+                        placeholder="Enter your address"
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                    />
+                    {errors.address && <p className="error">{errors.address}</p>}
+                </div>
+                <div className="mb-3">
+                    <label htmlFor="exampleInputCity" className="form-label">City</label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        id="exampleInputCity"
+                        placeholder="Enter your city"
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                    />
+                    {errors.city && <p className="error">{errors.city}</p>}
+                </div>
+                <div className="mb-3">
+                    <label htmlFor="exampleInputState" className="form-label">State</label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        id="exampleInputState"
+                        placeholder="Enter your state"
+                        value={state}
+                        onChange={(e) => setState(e.target.value)}
+                    />
+                    {errors.state && <p className="error">{errors.state}</p>}
                 </div>
                 <button 
                     type="submit" 

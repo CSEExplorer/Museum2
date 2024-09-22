@@ -25,20 +25,25 @@ class VerificationCodeSerializer(serializers.ModelSerializer):
         fields = ['user', 'code', 'created_at']
 
 
-# -------------------------------------------Signup serializers for checking email ---------------------------------------
+# -------------------------------------------Signup serializers for checking email and saving datat to UserProfile ---------------------------------------
 
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.core.validators import RegexValidator
 from django.core.validators import validate_email
 import re
 
 User = get_user_model()
 
 class SignUpSerializer(serializers.ModelSerializer):
+    phone_number = serializers.CharField(required=True, max_length=15, validators=[RegexValidator(r'^\+?1?\d{9,15}$')])
+    address = serializers.CharField(required=False, max_length=300)
+    city = serializers.CharField(required=True, max_length=100)
+    state = serializers.CharField(required=True, max_length=100)
     class Meta:
         model = User
-        fields = ['username', 'email', 'password']
+        fields = ['username', 'email', 'password', 'phone_number', 'address', 'city', 'state']
         extra_kwargs = {'password': {'write_only': True}}
 
     def validate_email(self, value):
@@ -65,4 +70,28 @@ class SignUpSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Password must contain at least one digit.")
         
         return value
+    def create(self, validated_data):
+        # Extract profile fields
+        phone_number = validated_data.pop('phone_number')
+        address = validated_data.pop('address')
+        city = validated_data.pop('city')
+        state = validated_data.pop('state')
+        
+        # Create the user
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            email=validated_data['email'],
+            password=validated_data['password']
+        )
+
+        # Create the user profile
+        UserProfile.objects.create(
+            user=user,
+            phone_number=phone_number,
+            address=address,
+            city=city,
+            state=state
+        )
+        
+        return user
 
