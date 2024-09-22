@@ -60,7 +60,7 @@ const Signup = () => {
                 username: name,
                 email: email,
                 password: password,
-                phone: phone, // Include phone in API request
+                phone_number: phone, // Include phone in API request
                 address: address, // Include address in API request
                 city: city, // Include city in API request
                 state: state // Include state in API request
