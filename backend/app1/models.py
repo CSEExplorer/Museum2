@@ -14,6 +14,7 @@ class UserProfile(models.Model):
     def __str__(self):
         return self.user.username
     
+    
 # --------------------------------otp Model------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -35,8 +36,9 @@ class VerificationCode(models.Model):
 
     def __str__(self):
         return f"{self.user.email} - {self.code}"
+    
 
-
+# ------------------------------------------Museum model ------------------------------------------------------------------
 
 
 

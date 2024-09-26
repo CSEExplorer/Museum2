@@ -1,17 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaUserCircle } from 'react-icons/fa'; // Import profile icon
-import Logo from '../Buttons/Logo.jpg'; // Corrected path and extension
+import Logo from '../Buttons/Logo.jpg'; // Adjust this path according to your structure
 import axios from 'axios';
-const apiUrl = process.env.REACT_APP_API_URL; 
+const apiUrl = process.env.REACT_APP_API_URL;
 const BASE_URL = 'https://museum-rr68.onrender.com';
 
 const Header = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [profileImage, setProfileImage] = useState(null);
+  const [loginDropdownOpen, setLoginDropdownOpen] = useState(false);
+  const [signupDropdownOpen, setSignupDropdownOpen] = useState(false);
   const navigate = useNavigate();
-  const dropdownRef = useRef(null); // Create a ref for the dropdown
+  const dropdownRef = useRef(null); // Create a ref for the profile dropdown
+  const loginDropdownRef = useRef(null); // Ref for login dropdown
+  const signupDropdownRef = useRef(null); // Ref for signup dropdown
 
   useEffect(() => {
     // Fetch profile image from backend if user is logged in
@@ -33,10 +37,16 @@ const Header = () => {
   }, []);
 
   useEffect(() => {
-    // Close dropdown if clicked outside of it
+    // Close dropdowns if clicked outside of them
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setDropdownOpen(false);
+      }
+      if (loginDropdownRef.current && !loginDropdownRef.current.contains(event.target)) {
+        setLoginDropdownOpen(false);
+      }
+      if (signupDropdownRef.current && !signupDropdownRef.current.contains(event.target)) {
+        setSignupDropdownOpen(false);
       }
     };
 
@@ -48,6 +58,14 @@ const Header = () => {
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
+  };
+
+  const toggleLoginDropdown = () => {
+    setLoginDropdownOpen(!loginDropdownOpen);
+  };
+
+  const toggleSignupDropdown = () => {
+    setSignupDropdownOpen(!signupDropdownOpen);
   };
 
   const handleSearchChange = (e) => {
@@ -129,8 +147,39 @@ const Header = () => {
           </form>
 
           <div className="text-end d-flex align-items-center">
-            <Link to="/login" className="btn btn-outline-light me-2">Login</Link>
-            <Link to="/signup" className="btn btn-warning">Sign-up</Link>
+            {/* Login Dropdown */}
+            <div className="dropdown me-2" ref={loginDropdownRef}>
+              <button
+                className="btn btn-outline-light dropdown-toggle"
+                onClick={toggleLoginDropdown}
+                type="button"
+              >
+                Login
+              </button>
+              {loginDropdownOpen && (
+                <ul className="dropdown-menu dropdown-menu-end show">
+                  <li><Link className="dropdown-item" to="/login">Login as User</Link></li>
+                  <li><Link className="dropdown-item" to="/museum-login">Login as Museum</Link></li>
+                </ul>
+              )}
+            </div>
+
+            {/* Signup Dropdown */}
+            <div className="dropdown me-2" ref={signupDropdownRef}>
+              <button
+                className="btn btn-warning dropdown-toggle"
+                onClick={toggleSignupDropdown}
+                type="button"
+              >
+                Sign-up
+              </button>
+              {signupDropdownOpen && (
+                <ul className="dropdown-menu dropdown-menu-end show">
+                  <li><Link className="dropdown-item" to="/signup">Signup as User</Link></li>
+                  <li><Link className="dropdown-item" to="/museum-signup">Signup as Museum</Link></li>
+                </ul>
+              )}
+            </div>
 
             {/* Profile Icon and Dropdown */}
             <div className="dropdown ms-3" ref={dropdownRef}>

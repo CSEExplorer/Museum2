@@ -46,9 +46,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework.authtoken',
     'app1.apps.App1Config',
-    # 'otp_static' ,
-    # 'otp_totp' ,
-    # 'two_factor' ,
+    'app2.apps.App2Config',
 ]
 
 MIDDLEWARE = [
@@ -135,8 +133,7 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.1/howto/static-files/
+
 import os
 
 
@@ -147,8 +144,6 @@ STATICFILES_DIRS=[os.path.join(BASE_DIR, 'static')]
 MEDIA_URL= '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -169,3 +164,5 @@ EMAIL_PORT=587
 EMAIL_HOST_USER="saxenaaditya381@gmail.com"
 EMAIL_HOST_PASSWORD="wxrt cmsd uvbc azwe"
 
+RAZORPAY_KEY_ID = 'rzp_test_qRwrfdLBNDfLRV'
+RAZORPAY_KEY_SECRET = 'kjlZAL5kpTnQaRU1GI2YTpI5'

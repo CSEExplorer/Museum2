@@ -14,7 +14,10 @@ import History from './Buttons/History';
 
 import ProfileAccount from './Buttons/ProfileAccount';
 import Tickets from './Buttons/Tickets';
-import Explore from './Buttons/Explore'; // Ensure this path is correct
+import Explore from './Buttons/Explore';
+import SignupMuseum from './Component/SignupMuseum';
+import LoginMuseum from './Component/LoginMuseum';
+import MuseumHeader from './Component/MuseumHeader';
 
 function App() {
   return (
@@ -24,13 +27,17 @@ function App() {
         <Route path="/" element={<><Cart /><Advertisement /><Review /></>} />
         <Route path="/information" element={<Information />} />
         <Route path="/login" element={<Login />} />
+        
         <Route path="/signup" element={<Signup />} />
         <Route path="/help" element={<Help />} />
+
         <Route path="/history" element={<History />} />
-      
+        <Route path="/museum-signup" element={<SignupMuseum/>}/>
         <Route path="/profile" element={<ProfileAccount />} />
         <Route path="/tickets" element={<Tickets />} />
         <Route path="/explore" element={<Explore />} />  {/* New route for Explore */}
+        <Route path="/museum-login" element={<LoginMuseum />} />
+        <Route path="/museum-header" element={<MuseumHeader />} />
       </Routes>
       <Chatboard />
      
