@@ -128,8 +128,6 @@ def get_user_profile(request):
 
 # -----------------------------------------Login With Email OTP--------------------------------------------------------------
 
-
-
 from django.contrib.auth import authenticate, login
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -209,4 +207,21 @@ def verify_otp(request):
             return JsonResponse({'error': 'Something went wrong. Please try again.'}, status=500)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
-   
+
+
+#---------------------------------------------------Museum view--------------------------------------------------------
+
+        #to show details on place.jsx when user serch for city 
+from app2.models import Museum
+from app2.serializers import MuseumSerializer
+
+
+@api_view(['GET'])
+def museum_list(request):
+    city = request.GET.get('city', '')
+    museums = Museum.objects.filter(city__icontains=city)
+    serializer = MuseumSerializer(museums, many=True)
+    return Response(serializer.data)
+
+
+# -----------------------------------------------------Booking view-------------------------------------------------------

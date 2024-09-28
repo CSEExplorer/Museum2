@@ -18,7 +18,7 @@ class Museum(models.Model):
     image = models.ImageField(upload_to='museums/images/', blank=True, null=True)
     password = models.CharField(max_length=128,null=False,blank = False,default=1234) 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,default=1)
-
+    fare  = models.IntegerField(default=0)
     # Additional details
     description = models.TextField(blank=True, null=True)
     contact_number = models.CharField(max_length=15, blank=True, null=True)

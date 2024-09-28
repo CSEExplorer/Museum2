@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 const BASE_URL = 'https://museum-rr68.onrender.com';
 const apiUrl = process.env.REACT_APP_API_URL; 
+const mediaUrl = process.env.REACT_APP_MEDIA_URL;
 const ProfileAccount = () => {
     const [userDetails, setUserDetails] = useState({
         username: '',
@@ -34,7 +35,7 @@ const ProfileAccount = () => {
                 setUserDetails(response.data);
                 setFormData(response.data);
                 if (response.data.profile_image) {
-                    setImagePreview(`${BASE_URL}${response.data.profile_image}`);
+                    setImagePreview(`${mediaUrl}${response.data.profile_image}`);
                 }
             } catch (error) {
                 console.error('Failed to fetch user details:', error);

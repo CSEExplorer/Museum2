@@ -4,7 +4,8 @@ import { FaUserCircle } from 'react-icons/fa'; // Import profile icon
 import Logo from '../Buttons/Logo.jpg'; // Adjust this path according to your structure
 import axios from 'axios';
 const apiUrl = process.env.REACT_APP_API_URL;
-const BASE_URL = 'https://museum-rr68.onrender.com';
+const mediaUrl = process.env.REACT_APP_MEDIA_URL;
+
 
 const Header = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -23,10 +24,10 @@ const Header = () => {
       const token = localStorage.getItem('token'); // Adjust token storage based on your auth logic
       if (token) {
         try {
-          const response = await axios.get(`${apiUrl}/profile/`, {
+          const response = await axios.get(`${apiUrl}/user/profile/`, {
             headers: { Authorization: `Token ${token}` },
           });
-          setProfileImage(`${BASE_URL}${response.data.profile_image}`); // Update with your actual API structure
+          setProfileImage(`${mediaUrl}${response.data.profile_image}`); // Update with your actual API structure
         } catch (error) {
           console.error('Error fetching profile image:', error);
         }

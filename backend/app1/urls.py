@@ -1,6 +1,6 @@
 from . import views
 from django.urls import path,include
-from .views import signup,login_view_normal,logout_view,get_user_profile,login_view_emailotp,verify_otp
+from .views import signup,logout_view,get_user_profile,login_view_emailotp,verify_otp,museum_list
 
 
 
@@ -10,6 +10,7 @@ urlpatterns=[
     path('api/user/profile/', get_user_profile, name='get_user_profile'),
     path('api/login/', login_view_emailotp, name='login'),
     path('api/verify_otp/', verify_otp, name='verify_otp'),
+    path('api/museums/city/', museum_list, name='museum-list'),
 ]
 
 

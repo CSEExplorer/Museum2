@@ -75,3 +75,25 @@ class MuseumLoginView(generics.GenericAPIView):
             }, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Invalid unique ID or password."}, status=status.HTTP_400_BAD_REQUEST)
+
+# ---------------------------------------------logout view ---------------------------------------------------------------
+from django.contrib.auth import get_user_model, authenticate, login, logout
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.authtoken.models import Token
+@csrf_exempt
+def logout_view(request):
+    if request.method == 'POST':
+        token_key = request.headers.get('Authorization').split()[1]
+        try:
+            token = Token.objects.get(key=token_key)
+            token.delete()
+            logout(request)
+            return JsonResponse({'message': 'Logged out successfully!'}, status=200)
+        except Token.DoesNotExist:
+            return JsonResponse({'error': 'Invalid token'}, status=400)
+        except Exception as e:
+            print(f"Error during logout: {e}")
+            return JsonResponse({'error': 'Internal server error'}, status=500)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)

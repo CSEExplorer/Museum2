@@ -17,8 +17,8 @@ import Tickets from './Buttons/Tickets';
 import Explore from './Buttons/Explore';
 import SignupMuseum from './Component/SignupMuseum';
 import LoginMuseum from './Component/LoginMuseum';
-import MuseumHeader from './Component/MuseumHeader';
-
+import MuseumDashboard from './Component/MuseumDashboard';
+import Places from './Buttons/Place';
 function App() {
   return (
     <Router>
@@ -27,7 +27,7 @@ function App() {
         <Route path="/" element={<><Cart /><Advertisement /><Review /></>} />
         <Route path="/information" element={<Information />} />
         <Route path="/login" element={<Login />} />
-        
+         <Route path="/places" element={<Places/>} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/help" element={<Help />} />
 
@@ -37,7 +37,7 @@ function App() {
         <Route path="/tickets" element={<Tickets />} />
         <Route path="/explore" element={<Explore />} />  {/* New route for Explore */}
         <Route path="/museum-login" element={<LoginMuseum />} />
-        <Route path="/museum-header" element={<MuseumHeader />} />
+        <Route path="/museum-dashboard" element={<MuseumDashboard />} />
       </Routes>
       <Chatboard />
      

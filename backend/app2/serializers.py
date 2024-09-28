@@ -7,13 +7,14 @@ import re
 import random
 import string
 from django.contrib.auth.models import User
+
 class MuseumSignupSerializer(serializers.ModelSerializer):
   
     name = serializers.CharField()  
     contact_number = serializers.CharField() 
     email = serializers.EmailField() 
     password = serializers.CharField(write_only=True)  
-
+     
     class Meta:
         model = Museum
         fields = ['name', 'contact_number', 'email', 'password']
@@ -71,4 +72,18 @@ class MuseumSignupSerializer(serializers.ModelSerializer):
         return museum
     
 
+# --------------------------------------------Museum Serilazer ----------------------------------------------------------
 
+from rest_framework import serializers
+from .models import Museum
+
+class MuseumSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Museum
+        fields = ['name', 'image', 'fare']
+
+
+
+
+
+   
