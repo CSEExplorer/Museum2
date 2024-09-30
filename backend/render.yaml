@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: my-django-app
+    env: python
+    plan: free
+    buildCommand: 
+      - pip install -r requirements.txt
+      - python manage.py collectstatic --no-input  # Collect static files during build
+    startCommand: gunicorn myproject.wsgi --log-file -  # Start the app with Gunicorn
+    envVars:
+      - key: DJANGO_ENV
+        value: production
+      - key: DEBUG
+        value: 'false'
+      - key: SECRET_KEY
+        value: your_secret_key_here
+    staticPublishPath: staticfiles/  # Publish static files directory
+    autoDeploy: true  # Automatically redeploy on changes
