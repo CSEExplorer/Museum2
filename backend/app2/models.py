@@ -43,45 +43,63 @@ class Museum(models.Model):
 
 #--------------------------------------------Availablity Model--------------------------------------------------------------
 
+from datetime import datetime, time, timedelta
+from django.db import models
 
 class Availability(models.Model):
-    # Days of the week choices
-    DAYS_OF_WEEK = [
-        ('Monday', 'Monday'),
-        ('Tuesday', 'Tuesday'),
-        ('Wednesday', 'Wednesday'),
-        ('Thursday', 'Thursday'),
-        ('Friday', 'Friday'),
-        ('Saturday', 'Saturday'),
-        ('Sunday', 'Sunday'),
-    ]
-
     # Reference to Museum
     museum = models.ForeignKey(Museum, on_delete=models.CASCADE, related_name='availabilities')
-    
-    # Day of the week field
-    day = models.CharField(max_length=9, choices=DAYS_OF_WEEK)
 
-    # Date field for ticket availability (optional if you want to track specific dates)
+    # Date field for specific date availability
     date = models.DateField(blank=True, null=True)
-    
-    # Time fields for specific periods during the day
-    start_time = models.TimeField(help_text="Start time for the slot, e.g., '09:00 AM'")
-    end_time = models.TimeField(help_text="End time for the slot, e.g., '11:00 AM'")
-    
-    # Number of tickets available for that time slot
-    tickets_available = models.PositiveIntegerField(default=0)
-    
+
+    # Day of the week (this will be automatically set based on date)
+    day = models.CharField(max_length=9, blank=True, editable=False)
+
+    # Opening and Closing times of the museum
+    opening_time = models.TimeField(default=time(10, 0))  # Default to 10:00 AM
+    closing_time = models.TimeField(default=time(18, 0), help_text="Closing time of the museum, e.g., '06:00 PM'")  # Default to 6:00 PM
+
     # Indicates if the museum is closed on this day
     is_closed = models.BooleanField(default=False)
 
     class Meta:
-        unique_together = ('museum', 'day', 'start_time', 'end_time')
-        ordering = ['museum', 'day', 'start_time']
+        unique_together = ('museum', 'date')
+        ordering = ['museum', 'date']
         verbose_name = "Availability"
         verbose_name_plural = "Availabilities"
 
-    def __str__(self):
-        return f"{self.museum.name} - {self.day} - {self.start_time} to {self.end_time}"
+    def save(self, *args, **kwargs):
+        """Override the save method to set the day based on the date."""
+        if self.date:
+            self.day = self.date.strftime('%A')  # Get the day name from the date
+        super().save(*args, **kwargs)  # Call the original save method
 
-# --------------------------------------------Token crednetila model ------------------------------------------------------
+    def __str__(self):
+        return f"{self.museum.name} - {self.day} ({self.date})"
+
+
+    
+
+# --------------------------------------------  Shift  model ------------------------------------------------------
+from django.db import models
+
+class Shift(models.Model):
+    SHIFT_CHOICES = [
+        ('Morning', 'Morning Shift'),
+        ('Evening', 'Evening Shift'),
+    ]
+
+    availability = models.ForeignKey('Availability', on_delete=models.CASCADE, related_name='shifts')
+    shift_type = models.CharField(max_length=10, choices=SHIFT_CHOICES)
+    tickets_available  = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        unique_together = ('availability', 'shift_type')
+        verbose_name = "Shift"
+        verbose_name_plural = "Shifts"
+
+    def __str__(self):
+        return f"{self.availability.museum.name} - {self.shift_type} - Tickets: {self.tickets_available}"
+
+# -----------------------------------------Booking detail save ------------------------------------------------------------4

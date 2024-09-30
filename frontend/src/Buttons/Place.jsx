@@ -7,6 +7,7 @@ const apiUrl = process.env.REACT_APP_API_URL;
 const mediaUrl = process.env.REACT_APP_MEDIA_URL;
 const Places = () => {
   const [museums, setMuseums] = useState([]);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -22,6 +23,7 @@ const Places = () => {
       try {
         const response = await axios.get(`${apiUrl}/museums/city/?city=${city}`);
         setMuseums(response.data);
+        
       } catch (err) {
         setError('Failed to fetch museums. Please try again.');
       } finally {
@@ -36,10 +38,11 @@ const Places = () => {
     setCity(event.target.value);
     setSearchParams({ city: event.target.value });
   };
-
-  const handleBookTicket = (museum) => {
-    navigate('/booking', { state: { museum } });
-  };
+ 
+ const handleBookTicket = (museum) => {
+  console.log('Selected Museum:', museum); // Check if museum object is valid
+  navigate('/booking', { state: { museum } });  // Pass museum object in state
+};
 
   return (
     <div className="container">

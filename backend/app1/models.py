@@ -15,7 +15,7 @@ class UserProfile(models.Model):
         return self.user.username
     
     
-# --------------------------------otp Model------------------------------------------------------------------------------------------------------------------------------------
+#--------------------------------otp Model------------------------------------------------------------------------------------------------------------------------------------
 
 
 
@@ -38,7 +38,22 @@ class VerificationCode(models.Model):
         return f"{self.user.email} - {self.code}"
     
 
-# ------------------------------------------Museum model ------------------------------------------------------------------
+#------------------------------------------Museum booking detail  ------------------------------------------------------------------
+from app2.models import Museum
+class Booking(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    museum = models.ForeignKey(Museum, on_delete=models.CASCADE)
+    date_of_visit = models.DateField()
+    number_of_tickets = models.IntegerField()
+    shift = models.CharField(max_length=20,default="Morning")
+
+    def __str__(self):
+        return f"{self.user.username} booked {self.number_of_tickets} tickets for {self.museum.name} on {self.date_of_visit}"
+
+
+
+
+    
 
 
 

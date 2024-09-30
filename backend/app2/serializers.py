@@ -80,9 +80,18 @@ from .models import Museum
 class MuseumSerializer(serializers.ModelSerializer):
     class Meta:
         model = Museum
-        fields = ['name', 'image', 'fare']
+        fields = ['name', 'image', 'fare','museum_id']
+
+# ----------------------------------------------------Giving Shifts ------------------------------------------------------
 
 
+from rest_framework import serializers
+from .models import Shift
+
+class ShiftSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Shift
+        fields = ['shift_type','tickets_available']
 
 
 

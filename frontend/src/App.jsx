@@ -11,7 +11,7 @@ import Signup from './Buttons/Signup';
 import Help from './Buttons/Help';
 import Chatboard from './Component/Chatboard';
 import History from './Buttons/History';
-
+import Booking  from './Buttons/Booking';
 import ProfileAccount from './Buttons/ProfileAccount';
 import Tickets from './Buttons/Tickets';
 import Explore from './Buttons/Explore';
@@ -30,7 +30,7 @@ function App() {
          <Route path="/places" element={<Places/>} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/help" element={<Help />} />
-
+        <Route path="booking" element={<Booking/>}/>
         <Route path="/history" element={<History />} />
         <Route path="/museum-signup" element={<SignupMuseum/>}/>
         <Route path="/profile" element={<ProfileAccount />} />

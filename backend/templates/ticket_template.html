@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .content {
+            margin-bottom: 20px;
+        }
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: gray;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Booking Confirmation</h1>
+    </div>
+    <div class="content">
+        <p>Dear {{user.username}}</p>
+        <p>Thank you for booking with us! Below are your booking details:</p>
+        <p><strong>Museum:</strong> {{ museum.name }}</p>
+        <p><strong>Shift</strong> {{shift.shift_type}}</p>
+        <p><strong>Fare:</strong> ${{ museum.fare }}</p>
+        <p><strong>Booking Date:</strong> {{ date_of_visit }}</p>
+        <p>If you have any questions, feel free to contact us.</p>
+
+    </div>
+    <div class="footer">
+        <p>Powered by [Aditya Corporation]</p>
+    </div>
+</body>
+</html>
