@@ -398,7 +398,7 @@ from xhtml2pdf import pisa
 from django.core.mail import send_mail, EmailMessage
 from django.template.loader import render_to_string
 @csrf_exempt
-@api_view(['POST'])
+
 def confirm_booking_status(request):
     if request.method == 'POST':
         email = request.data.get('email')

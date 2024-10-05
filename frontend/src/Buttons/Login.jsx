@@ -50,6 +50,7 @@ const Login = () => {
                 });
                 console.log('OTP verification successful:', response.data);
                 localStorage.setItem('token', response.data.token);
+                
                 navigate('/profile');
             } catch (error) {
                 console.error('OTP verification failed:', error.response.data);

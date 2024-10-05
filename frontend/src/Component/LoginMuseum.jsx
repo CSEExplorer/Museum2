@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState,useContext } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
+import { RoleContext } from '../contexts/RoleProvider';
 const apiUrl = process.env.REACT_APP_API_URL;
 
 const LoginMuseum = () => {
+    const { changeRole } = useContext(RoleContext); 
     const [uniqueId, setUniqueId] = useState(''); // State for unique ID
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
@@ -22,11 +23,21 @@ const LoginMuseum = () => {
                 password: password,
             });
             // Store token or user info as needed
+              if (response.data.token) {
+            // Store token and role
             localStorage.setItem('token', response.data.token);
+          
+            changeRole('admin');  
+            
+
             setMessage('Login successful!');
             setErrors({});
-            // Redirect to museum owner dashboard or main museum page
-            navigate('/museum-dashboard'); // Change to the desired route
+            
+            // Redirect to the museum dashboard
+            navigate('/museum-dashboard');
+        } else {
+            setErrors({ general: 'Login failed. Token not found.' });
+        }
         } catch (error) {
             if (error.response && error.response.data.errors) {
                 setErrors(error.response.data.errors);
