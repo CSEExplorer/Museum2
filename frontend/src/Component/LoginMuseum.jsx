@@ -6,6 +6,7 @@ const apiUrl = process.env.REACT_APP_API_URL;
 
 const LoginMuseum = () => {
     const { changeRole } = useContext(RoleContext); 
+    //destructurieng the RoleContext;
     const [uniqueId, setUniqueId] = useState(''); // State for unique ID
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');

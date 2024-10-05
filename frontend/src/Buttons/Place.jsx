@@ -10,6 +10,7 @@ const Places = () => {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  // = useSearchParams();  this is used to get the url paramters of the current url 
   const [searchParams, setSearchParams] = useSearchParams();
   const [city, setCity] = useState(searchParams.get('city') || '');
   const navigate = useNavigate();
@@ -46,7 +47,7 @@ const Places = () => {
 
   return (
     <div className="container">
-      <h1 className="mt-4">Museums in {city || '...'}</h1>
+      <h1 className="mt-4">Museums in {city || '..'}</h1>
 
       <input
         type="text"

@@ -3,6 +3,8 @@ import axios from 'axios';
 const BASE_URL = 'https://museum-rr68.onrender.com';
 const apiUrl = process.env.REACT_APP_API_URL; 
 const mediaUrl = process.env.REACT_APP_MEDIA_URL;
+import { useProfile } from '../contexts/ProfileContext';
+
 const ProfileAccount = () => {
     const [userDetails, setUserDetails] = useState({
         username: '',
@@ -18,6 +20,8 @@ const ProfileAccount = () => {
     const [formData, setFormData] = useState({ ...userDetails });
     const [selectedImage, setSelectedImage] = useState(null);
     const [imagePreview, setImagePreview] = useState('');
+    const {setProfile } = useProfile();
+  
 
     useEffect(() => {
         const fetchUserDetails = async () => {
@@ -80,13 +84,17 @@ const ProfileAccount = () => {
                 data.append('profile_image', selectedImage);
             }
 
-            await axios.put(`${apiUrl}/user/profile/`, data,{
+            const response  = await axios.put(`${apiUrl}/user/profile/`, data,{
                 headers: {
                     Authorization: `Token ${token}`,
                     'Content-Type': 'multipart/form-data'
                 },
             });
             setUserDetails(formData);
+            setProfile((prev) => ({
+            ...prev,
+            profile_image:response.data.profile_image || formData.profile_image, // Update with new image URL
+        }));
             setEditMode(false);
             setError('');
         } catch (error) {

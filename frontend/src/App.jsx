@@ -21,10 +21,12 @@ import MuseumDashboard from './Component/MuseumDashboard';
 import Places from './Buttons/Place';
 import MuseumLogout from './Component/MuseumLogout';
 import { RoleProvider } from './contexts/RoleProvider';
+import { ProfileProvider } from './contexts/ProfileContext';
 
 function App() {
   return (
     <RoleProvider>
+      <ProfileProvider>
       <Router>
         {/* Render HeaderSelector to switch between headers based on role */}
         <HeaderSelector /> 
@@ -50,7 +52,8 @@ function App() {
         </Routes>
         <Chatboard />
         <Footer />
-      </Router>
+        </Router>
+        </ProfileProvider>
     </RoleProvider>
   );
 }

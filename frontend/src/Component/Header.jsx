@@ -5,12 +5,13 @@ import Logo from '../Buttons/Logo.jpg'; // Adjust this path according to your st
 import axios from 'axios';
 const apiUrl = process.env.REACT_APP_API_URL;
 const mediaUrl = process.env.REACT_APP_MEDIA_URL;
-
+import { useProfile } from '../contexts/ProfileContext';
 
 const Header = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [profileImage, setProfileImage] = useState(null);
+  const { profile } = useProfile(); 
   const [loginDropdownOpen, setLoginDropdownOpen] = useState(false);
   const [signupDropdownOpen, setSignupDropdownOpen] = useState(false);
   const navigate = useNavigate();
@@ -139,7 +140,7 @@ const Header = () => {
           <form className="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search" onSubmit={handleSearchSubmit}>
             <input
               type="search"
-              className="form-control form-control-dark text-bg-dark"
+              className="form-control form-control-dark text-bg-light"
               placeholder="Search City"
               aria-label="Search"
               value={searchQuery}
@@ -189,14 +190,14 @@ const Header = () => {
                 onClick={toggleDropdown}
                 style={{ padding: '0', borderRadius: '50%', overflow: 'hidden', width: '40px', height: '40px' }} // Ensures circular container
               >
-                {profileImage ? (
+                {profile.profile_image  ? (
                   <img
-                    src={profileImage}
+                    src={`${mediaUrl}${profile.profile_image}`}
                     alt="Profile"
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }} // Circular and responsive image
                   />
                 ) : (
-                  <FaUserCircle size={30} color="white" />
+                  <FaUserCircle size={40} color="white" />
                 )}
               </button>
 
