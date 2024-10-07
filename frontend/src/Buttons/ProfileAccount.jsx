@@ -3,9 +3,9 @@ import axios from 'axios';
 const BASE_URL = 'https://museum-rr68.onrender.com';
 const apiUrl = process.env.REACT_APP_API_URL; 
 const mediaUrl = process.env.REACT_APP_MEDIA_URL;
-import { useProfile } from '../contexts/ProfileContext';
+// import { useProfile } from '../contexts/ProfileContext';
 
-const ProfileAccount = () => {
+const ProfileAccount = ({ setProfile}) => {
     const [userDetails, setUserDetails] = useState({
         username: '',
         email: '',
@@ -20,7 +20,7 @@ const ProfileAccount = () => {
     const [formData, setFormData] = useState({ ...userDetails });
     const [selectedImage, setSelectedImage] = useState(null);
     const [imagePreview, setImagePreview] = useState('');
-    const {setProfile } = useProfile();
+    // const {setProfile } = useProfile();
   
 
     useEffect(() => {
@@ -38,8 +38,13 @@ const ProfileAccount = () => {
                 });
                 setUserDetails(response.data);
                 setFormData(response.data);
+
                 if (response.data.profile_image) {
                     setImagePreview(`${mediaUrl}${response.data.profile_image}`);
+                    setProfile((prev) => ({
+            ...prev,
+            profile_image:response.data.profile_image || formData.profile_image, // Update with new image URL
+        }));
                 }
             } catch (error) {
                 console.error('Failed to fetch user details:', error);

@@ -4,10 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { RoleContext } from '../contexts/RoleProvider';
 const apiUrl = process.env.REACT_APP_API_URL;
 
-const LoginMuseum = () => {
+const LoginMuseum = ({uniqueId, setUniqueId }) => {
     const { changeRole } = useContext(RoleContext); 
-    //destructurieng the RoleContext;
-    const [uniqueId, setUniqueId] = useState(''); // State for unique ID
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
     const [errors, setErrors] = useState({});
@@ -27,7 +25,7 @@ const LoginMuseum = () => {
               if (response.data.token) {
             // Store token and role
             localStorage.setItem('token', response.data.token);
-          
+                  setUniqueId(response.data.uniqueId);
             changeRole('admin');  
             
 

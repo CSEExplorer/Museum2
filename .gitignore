@@ -28,3 +28,7 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+
+
+# Ignore ProfileContext
+src/contexts/ProfileContext.jsx

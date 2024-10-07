@@ -71,7 +71,8 @@ class MuseumLoginView(generics.GenericAPIView):
             return Response({
                 "message": "Login successful",
                 "token": token.key,
-                "name": museum.name
+                "name": museum.name,
+                "uniqueId":unique_id,
             }, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Invalid unique ID or password."}, status=status.HTTP_400_BAD_REQUEST)
@@ -97,3 +98,35 @@ def logout_view(request):
             return JsonResponse({'error': 'Internal server error'}, status=500)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+
+
+# ------------------------------fetching Musuem details all -------------------------------------------------------------
+
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Museum
+from .serializers import MuseumSerializer
+
+@api_view(['GET','POST'])
+def get_museum_details(request):
+    """
+    Retrieve museum details along with availability by uniqueId.
+    """
+    try:
+        # Extract uniqueId from request data
+        unique_id = request.data.get('uniqueId')
+        
+        if not unique_id:
+            return Response({'error': 'Unique ID not provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Fetch the museum by unique_id
+        museum = Museum.objects.get(unique_id=unique_id)
+       
+        serializer = MuseumSerializer(museum)
+        
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    except Museum.DoesNotExist:
+        return Response({'error': 'Museum not found'}, status=status.HTTP_404_NOT_FOUND)

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HeaderSelector from './Component/HeaderSelector'; // Import HeaderSelector
 import Footer from './Component/Footer';
@@ -21,39 +21,45 @@ import MuseumDashboard from './Component/MuseumDashboard';
 import Places from './Buttons/Place';
 import MuseumLogout from './Component/MuseumLogout';
 import { RoleProvider } from './contexts/RoleProvider';
-import { ProfileProvider } from './contexts/ProfileContext';
+// import { ProfileProvider } from './contexts/ProfileContext';
 
 function App() {
+   const [profile, setProfile] = useState({
+        profile_image: '',
+        username: '',
+        email: '',
+   });
+   const [uniqueId, setUniqueId] = useState(null); 
   return (
     <RoleProvider>
-      <ProfileProvider>
+     
       <Router>
-        {/* Render HeaderSelector to switch between headers based on role */}
-        <HeaderSelector /> 
+        
+        <HeaderSelector profile={profile}/> 
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<><Cart /><Advertisement /><Review /></>} />
           <Route path="/information" element={<Information />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/login" element={<Login />}  />
           <Route path="/places" element={<Places />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/help" element={<Help />} />
           <Route path="/booking" element={<Booking />} />
           <Route path="/history" element={<History />} />
-          <Route path="/profile" element={<ProfileAccount />} />
+          <Route path="/profile" element={<ProfileAccount  setProfile={setProfile} />} />
           <Route path="/tickets" element={<Tickets />} />
           <Route path="/explore" element={<Explore />} />
 
           {/* Museum Owner Routes */}
           <Route path="/museum-signup" element={<SignupMuseum />} />
-          <Route path="/museum-login" element={<LoginMuseum />} />
-          <Route path="/museum-dashboard" element={<MuseumDashboard />} />
+          <Route path="/museum-login" element={<LoginMuseum uniqueId={ uniqueId } setUniqueId={ setUniqueId } />} />
+          <Route path="/museum-dashboard" element={<MuseumDashboard   uniqueId={ uniqueId } />} />
           <Route path="/museum-logout" element={<MuseumLogout />} />
         </Routes>
         <Chatboard />
         <Footer />
         </Router>
-        </ProfileProvider>
+        
     </RoleProvider>
   );
 }

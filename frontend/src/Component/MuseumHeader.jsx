@@ -18,7 +18,7 @@ const MuseumHeader = () => {
     );
 };
 
-// Inline styles
+
 const headerStyles = {
     backgroundColor: '#343a40',
     color: 'white',

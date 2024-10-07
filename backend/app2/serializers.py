@@ -1,7 +1,7 @@
  # ----------------------------------------Signnup MuseumSerializer-----------------------------------------------
 # serializers.py
 from rest_framework import serializers
-from .models import Museum
+from .models import Museum,Availability,Shift
 from django.contrib.auth.hashers import make_password
 import re
 import random
@@ -72,17 +72,12 @@ class MuseumSignupSerializer(serializers.ModelSerializer):
         return museum
     
 
-# --------------------------------------------Museum Serilazer ----------------------------------------------------------
 
-from rest_framework import serializers
-from .models import Museum
 
-class MuseumSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Museum
-        fields = ['name', 'image', 'fare','museum_id']
+
 
 # ----------------------------------------------------Giving Shifts ------------------------------------------------------
+
 
 
 from rest_framework import serializers
@@ -95,4 +90,23 @@ class ShiftSerializer(serializers.ModelSerializer):
 
 
 
-   
+# -------------------------------------AvailblitySerilazer--------------------------------------------------------------
+class AvailabilitySerializer(serializers.ModelSerializer):
+    shifts = ShiftSerializer(many=True, read_only=True)  # This will serialize the related shifts
+
+    class Meta:
+        model = Availability
+        fields = ['closing_time', 'opening_time', 'shifts']
+
+
+
+# ------------------------------------Museum Serilazer------------------------------------------------------------------
+
+from rest_framework import serializers
+from .models import Museum
+
+class MuseumSerializer(serializers.ModelSerializer):
+    availabilities = AvailabilitySerializer(read_only=True) 
+    class Meta:
+        model = Museum
+        fields = ['name', 'image', 'fare','museum_id','state','city','address','email','closing_days','availabilities']

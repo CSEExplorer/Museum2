@@ -7,11 +7,11 @@ const apiUrl = process.env.REACT_APP_API_URL;
 const mediaUrl = process.env.REACT_APP_MEDIA_URL;
 import { useProfile } from '../contexts/ProfileContext';
 
-const Header = () => {
+const Header = ({ profile}) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [profileImage, setProfileImage] = useState(null);
-  const { profile } = useProfile(); 
+  // const [profileImage, setProfileImage] = useState(null);
+  // const { profile } = useProfile(); 
   const [loginDropdownOpen, setLoginDropdownOpen] = useState(false);
   const [signupDropdownOpen, setSignupDropdownOpen] = useState(false);
   const navigate = useNavigate();
@@ -19,24 +19,7 @@ const Header = () => {
   const loginDropdownRef = useRef(null); // Ref for login dropdown
   const signupDropdownRef = useRef(null); // Ref for signup dropdown
 
-  useEffect(() => {
-    // Fetch profile image from backend if user is logged in
-    const fetchProfileImage = async () => {
-      const token = localStorage.getItem('token'); // Adjust token storage based on your auth logic
-      if (token) {
-        try {
-          const response = await axios.get(`${apiUrl}/user/profile/`, {
-            headers: { Authorization: `Token ${token}` },
-          });
-          setProfileImage(`${mediaUrl}${response.data.profile_image}`); // Update with your actual API structure
-        } catch (error) {
-          console.error('Error fetching profile image:', error);
-        }
-      }
-    };
-
-    fetchProfileImage();
-  }, []);
+// no need of fethcing image here just passded as prop in header and things work 
 
   useEffect(() => {
     // Close dropdowns if clicked outside of them
@@ -105,10 +88,13 @@ const Header = () => {
           Authorization: `Token ${token}`,  // Get token from local storage
         },
       });
-
+     
       // Remove the token from local storage
       localStorage.removeItem('token');
-      
+     
+
+        // Reload the page to reflect the changes in the header
+        window.location.reload();
       // Redirect to login page
       navigate('/login');
     } catch (error) {
@@ -190,7 +176,7 @@ const Header = () => {
                 onClick={toggleDropdown}
                 style={{ padding: '0', borderRadius: '50%', overflow: 'hidden', width: '40px', height: '40px' }} // Ensures circular container
               >
-                {profile.profile_image  ? (
+                {profile && profile.profile_image ? (
                   <img
                     src={`${mediaUrl}${profile.profile_image}`}
                     alt="Profile"
@@ -205,7 +191,17 @@ const Header = () => {
                 <ul className="dropdown-menu dropdown-menu-end show">
                   <li><Link className="dropdown-item" to="/profile">Profile</Link></li>
                   <li><Link className="dropdown-item" to="/history">History</Link></li>
-                  <li><button className="dropdown-item" onClick={handleLogout}>Sign Out</button></li>
+                  <li>
+    <button 
+        className="dropdown-item" 
+        onClick={() => {
+            handleLogout(); 
+           
+        }}
+    >
+        Sign Out
+    </button>
+</li>
                 </ul>
               )}
             </div>
