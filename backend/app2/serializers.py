@@ -86,17 +86,17 @@ from .models import Shift
 class ShiftSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shift
-        fields = ['shift_type','tickets_available']
+        fields = '__all__'
 
 
 
 # -------------------------------------AvailblitySerilazer--------------------------------------------------------------
 class AvailabilitySerializer(serializers.ModelSerializer):
-    shifts = ShiftSerializer(many=True, read_only=True)  # This will serialize the related shifts
+    shifts = ShiftSerializer(many=True)  # This will serialize the related shifts
 
     class Meta:
         model = Availability
-        fields = ['closing_time', 'opening_time', 'shifts']
+        fields = ['date','day','opening_time','closing_time','is_closed', 'shifts']
 
 
 
@@ -106,7 +106,7 @@ from rest_framework import serializers
 from .models import Museum
 
 class MuseumSerializer(serializers.ModelSerializer):
-    availabilities = AvailabilitySerializer(read_only=True) 
+    availabilities = AvailabilitySerializer(many=True) 
     class Meta:
         model = Museum
-        fields = ['name', 'image', 'fare','museum_id','state','city','address','email','closing_days','availabilities']
+        fields = '__all__'

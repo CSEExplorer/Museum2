@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import HeaderSelector from './Component/HeaderSelector'; // Import HeaderSelector
+import HeaderSelector from './Component/HeaderSelector'; 
 import Footer from './Component/Footer';
 import Cart from './Component/Cart';
 import Advertisement from './Component/Advertisement';
@@ -21,7 +21,8 @@ import MuseumDashboard from './Component/MuseumDashboard';
 import Places from './Buttons/Place';
 import MuseumLogout from './Component/MuseumLogout';
 import { RoleProvider } from './contexts/RoleProvider';
-// import { ProfileProvider } from './contexts/ProfileContext';
+import Availability from './Component/Availaiblity';
+import { MuseumProvider } from './contexts/MuseumContext'; 
 
 function App() {
    const [profile, setProfile] = useState({
@@ -30,37 +31,38 @@ function App() {
         email: '',
    });
    const [uniqueId, setUniqueId] = useState(null); 
+
   return (
     <RoleProvider>
-     
-      <Router>
-        
-        <HeaderSelector profile={profile}/> 
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<><Cart /><Advertisement /><Review /></>} />
-          <Route path="/information" element={<Information />} />
-          <Route path="/login" element={<Login />}  />
-          <Route path="/places" element={<Places />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/help" element={<Help />} />
-          <Route path="/booking" element={<Booking />} />
-          <Route path="/history" element={<History />} />
-          <Route path="/profile" element={<ProfileAccount  setProfile={setProfile} />} />
-          <Route path="/tickets" element={<Tickets />} />
-          <Route path="/explore" element={<Explore />} />
+  <Router>
+    <HeaderSelector profile={profile}/> 
+    <MuseumProvider>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<><Cart /><Advertisement /><Review /></>} />
+        <Route path="/information" element={<Information />} />
+        <Route path="/login" element={<Login />}  />
+        <Route path="/places" element={<Places />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/help" element={<Help />} />
+        <Route path="/booking" element={<Booking />} />
+        <Route path="/history" element={<History />} />
+        <Route path="/profile" element={<ProfileAccount setProfile={setProfile} />} />
+        <Route path="/tickets" element={<Tickets />} />
+        <Route path="/explore" element={<Explore />} />
 
-          {/* Museum Owner Routes */}
-          <Route path="/museum-signup" element={<SignupMuseum />} />
-          <Route path="/museum-login" element={<LoginMuseum uniqueId={ uniqueId } setUniqueId={ setUniqueId } />} />
-          <Route path="/museum-dashboard" element={<MuseumDashboard   uniqueId={ uniqueId } />} />
-          <Route path="/museum-logout" element={<MuseumLogout />} />
-        </Routes>
-        <Chatboard />
-        <Footer />
-        </Router>
-        
-    </RoleProvider>
+        {/* Museum Owner Routes */}
+        <Route path="/museum-signup" element={<SignupMuseum />} />
+        <Route path="/museum-login" element={<LoginMuseum uniqueId={uniqueId} setUniqueId={setUniqueId} />} />
+        <Route path="/museum-dashboard" element={<MuseumDashboard uniqueId={uniqueId} />} />
+        <Route path="/museum-logout" element={<MuseumLogout />} />
+        <Route path="/availabilities" element={<Availability />} />
+      </Routes>
+    </MuseumProvider>
+    <Chatboard />
+    <Footer />
+  </Router>
+</RoleProvider>
   );
 }
 

@@ -15,7 +15,7 @@ const UpdateTicket = () => {
       Price: 0,
   });
 
-  // Fetch ticket data when component loads
+ 
   useEffect(() => {
     fetchTicketData();
   }, []);

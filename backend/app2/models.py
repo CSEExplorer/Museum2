@@ -49,7 +49,7 @@ from django.db import models
 class Availability(models.Model):
     # Reference to Museum
     museum = models.ForeignKey(Museum, on_delete=models.CASCADE, related_name='availabilities')
-
+    
     # Date field for specific date availability
     date = models.DateField(blank=True, null=True)
 
