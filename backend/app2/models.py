@@ -69,14 +69,7 @@ class Availability(models.Model):
         verbose_name = "Availability"
         verbose_name_plural = "Availabilities"
 
-    def save(self, *args, **kwargs):
-        """Override the save method to set the day based on the date."""
-        if self.date:
-            self.day = self.date.strftime('%A')  # Get the day name from the date
-        super().save(*args, **kwargs)  # Call the original save method
-
-    def __str__(self):
-        return f"{self.museum.name} - {self.day} ({self.date})"
+   
 
 
     

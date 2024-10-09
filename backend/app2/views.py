@@ -130,3 +130,56 @@ def get_museum_details(request):
     
     except Museum.DoesNotExist:
         return Response({'error': 'Museum not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+# ---------------------------------------------Add Avialblity -----------------------------------------------------------------------------
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Availability, Shift, Museum
+from .serializers import AvailabilitySerializer, ShiftSerializer
+
+@api_view(['POST'])
+def create_availability_with_shifts(request):
+    
+    availability_data = request.data.get('availability')
+    shifts_data = request.data.get('shifts')
+    
+    if not availability_data or not shifts_data:
+        return Response({'error': 'Availability or shifts data is missing'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Find the museum based on uniqueId
+    try:
+        museum = Museum.objects.get(unique_id=availability_data['museum'])
+    except Museum.DoesNotExist:
+        return Response({'error': 'Museum not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    # Create or update availability
+    availability_date = availability_data['date']
+    availability, created = Availability.objects.get_or_create(
+        museum=museum,
+        date=availability_date,
+       
+    )
+
+    if created:
+        # Availability created successfully
+        availability.save()
+    else:
+        # Availability already exists, you might want to handle updates here
+        return Response({'message': 'Availability already exists for this date'}, status=status.HTTP_400_BAD_REQUEST)
+
+   
+    for shift_data in shifts_data:
+        shift_serializer = ShiftSerializer(data={**shift_data, 'availability': availability.id})
+        if shift_serializer.is_valid():
+            shift_serializer.save()
+        else:
+            # If any shift is invalid, you might want to delete the created availability
+            availability.delete()
+            return Response(shift_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    return Response({
+        'availability': AvailabilitySerializer(availability).data,
+        'shifts': ShiftSerializer(Shift.objects.filter(availability=availability), many=True).data
+    }, status=status.HTTP_201_CREATED)

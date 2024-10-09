@@ -52,19 +52,26 @@ const MuseumDashboard = ({ uniqueId }) => {
                         <div className="card-body">
                             <h5>Availabilities</h5>
                             <p><strong>Total Number of Availabilities:</strong> {museumData.availabilities.length}</p>
-                            <Link to="/availabilities" className="btn btn-info">View All Availabilities</Link>
+                            <Link to="/museumavailabilities" className="btn btn-info">Add Availabilities</Link>
                         </div>
                     </div>
                 </div>
-                { /*  save new Avilablity  */}
+                   { /*  save new Avilablity  */}
+
                 <div className="col-md-12 mb-4">
-    <div className="card" style={styles.card}>
-        <div className="card-body">
-            <h5>Add New Availability</h5>
-            <Link to={`/add-availability`} className="btn btn-success">Add Availability</Link>
-        </div>
-    </div>
+                    <div className="card" style={styles.card}>
+                        <div className="card-body">
+                            <h5>Availabilities</h5>
+                            <p><strong>Total Number of Availabilities:</strong> {museumData.availabilities.length}</p>
+                            <Link to="/availabilities" className="btn btn-info">Update  OR  Delete Availabilities</Link>
+                        </div>
+                    </div>
                 </div>
+
+                
+
+              
+ 
                 
 
 

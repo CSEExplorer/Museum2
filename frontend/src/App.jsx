@@ -23,6 +23,7 @@ import MuseumLogout from './Component/MuseumLogout';
 import { RoleProvider } from './contexts/RoleProvider';
 import Availability from './Component/Availaiblity';
 import { MuseumProvider } from './contexts/MuseumContext'; 
+import MuseumAvailability from './Component/MuseumAvailabilities';
 
 function App() {
    const [profile, setProfile] = useState({
@@ -50,13 +51,17 @@ function App() {
         <Route path="/profile" element={<ProfileAccount setProfile={setProfile} />} />
         <Route path="/tickets" element={<Tickets />} />
         <Route path="/explore" element={<Explore />} />
+        <Route path="/availabilities" element={<Availability />} />
 
         {/* Museum Owner Routes */}
-        <Route path="/museum-signup" element={<SignupMuseum />} />
+            <Route path="/museum-signup" element={<SignupMuseum />} />
+            <Route path="/museumavailabilities" element={<MuseumAvailability uniqueId={uniqueId} />} />
+            
+            
         <Route path="/museum-login" element={<LoginMuseum uniqueId={uniqueId} setUniqueId={setUniqueId} />} />
         <Route path="/museum-dashboard" element={<MuseumDashboard uniqueId={uniqueId} />} />
         <Route path="/museum-logout" element={<MuseumLogout />} />
-        <Route path="/availabilities" element={<Availability />} />
+        
       </Routes>
     </MuseumProvider>
     <Chatboard />
