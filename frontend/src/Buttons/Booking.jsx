@@ -108,7 +108,7 @@ const Booking = () => {
 
       // Create Razorpay order
       const response = await axios.post(`${apiUrl}/museums/${museum.museum_id}/create_order/`, {
-        amount: museum.fare * 100,  // Ensure amount is in paise (multiply by 100)
+        amount: 5 * 100,  // Ensure amount is in paise (multiply by 100)
         email: email,
       }, {
         headers: {

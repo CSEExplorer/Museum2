@@ -8,9 +8,15 @@ export const MuseumProvider = ({ children }) => {
     const saveMuseumData = (data) => {
         setMuseumData(data);
     };
+    const updateAvailability = (newAvailability) => {
+        setMuseumData((prevData) => ({
+            ...prevData,
+            availability: newAvailability,
+        }));
+    };
 
     return (
-        <MuseumContext.Provider value={{ museumData, setMuseumData }}>
+        <MuseumContext.Provider value={{ museumData, setMuseumData,updateAvailability}}>
             {children}
         </MuseumContext.Provider>
     );

@@ -397,47 +397,56 @@ from io import BytesIO
 from xhtml2pdf import pisa
 from django.core.mail import send_mail, EmailMessage
 from django.template.loader import render_to_string
-@csrf_exempt
 
+import json
+@csrf_exempt
 def confirm_booking_status(request):
     if request.method == 'POST':
-        email = request.data.get('email')
-        shift_id = request.data.get('shift_id')
-        museum_id  = request.data.get('id')
-        # Fetch user from email
-        user = get_object_or_404(User, email=email)
-        museum = get_object_or_404(Museum, museum_id=museum_id)
-        shift =  get_object_or_404(Shift, id=shift_id)
-       
-        booking = Booking(
-            user=user,
-            shift=shift,
-            museum=museum,
-            date_of_visit=timezone.now().date(),  # Set this according to your booking logic
-            number_of_tickets=1  # Adjust this as necessary
-        )
-        booking.save()
+        try:
+            data = json.loads(request.body)  # Parse JSON body
+            email = data.get('email')
+            shift_id = data.get('shift_id')
+            museum_id  = data.get('id')
 
-    html = render_to_string('ticket_template.html', {'museum': museum, 'shift': shift})
+            if not email or not shift_id or not museum_id:
+                return JsonResponse({'error': 'Missing required fields.'}, status=400)
 
-    # Generate PDF
-    pdf_buffer = BytesIO()
-    pisa_status = pisa.CreatePDF(html, dest=pdf_buffer)
+            user = get_object_or_404(User, email=email)
+            museum = get_object_or_404(Museum, museum_id=museum_id)
+            shift = get_object_or_404(Shift, id=shift_id)
 
-    if pisa_status.err:
-        return JsonResponse({"error": "Failed to generate PDF."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            booking = Booking(
+                user=user,
+                shift=shift,
+                museum=museum,
+                date_of_visit=timezone.now().date(),  # Set this according to your booking logic
+                number_of_tickets=1  # Adjust this as necessary
+            )
+            booking.save()
 
-    pdf_buffer.seek(0)
-    pdf_file = pdf_buffer.read()
+            html = render_to_string('ticket_template.html', {'museum': museum, 'shift': shift})
 
-    # Send email with PDF attachment
-    email_message = EmailMessage(
-        subject='Booking Confirmation',
-        body='Your ticket is attached as a PDF.',
-        from_email='your_email@gmail.com',
-        to=[email],
-    )
-    email_message.attach('ticket.pdf', pdf_file, 'application/pdf')
-    email_message.send()
-    return JsonResponse({'message': 'Booking confirmed and email sent!'}, status=200)
-    return JsonResponse({'error': 'Invalid request method.'}, status=400)
+            # Generate PDF
+            pdf_buffer = BytesIO()
+            pisa_status = pisa.CreatePDF(html, dest=pdf_buffer)
+
+            if pisa_status.err:
+                return JsonResponse({"error": "Failed to generate PDF."}, status=500)
+
+            pdf_buffer.seek(0)
+            pdf_file = pdf_buffer.read()
+
+            # Send email with PDF attachment
+            email_message = EmailMessage(
+                subject='Booking Confirmation',
+                body='Your ticket is attached as a PDF.',
+                from_email='your_email@gmail.com',
+                to=[email],
+            )
+            email_message.attach('ticket.pdf', pdf_file, 'application/pdf')
+            email_message.send()
+
+            return JsonResponse({'message': 'Booking confirmed and email sent!'}, status=200)
+
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON.'}, status=400)
