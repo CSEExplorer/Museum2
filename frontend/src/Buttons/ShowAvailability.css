@@ -72,7 +72,7 @@
 
 /* Additional styles for closed days */
 .closed-day {
-  background-color: #f8d7da; /* Light red for closed days */
+  background-color: #716f6f; /* Light red for closed days */
   border: 1px solid #f5c6cb; /* Darker border */
 }
 
@@ -95,4 +95,11 @@
   .day-name {
       font-size: 16px; /* Responsive font size */
   }
+
+}
+
+.shift-card.selected {
+  background-color: lightpink; /* Change to light pink */
+  border: 2px solid #f50057; /* Optional: Add a border to distinguish the selected shift */
+  color: white; /* Optional: Change text color for contrast */ /* Text color when selected */
 }

@@ -13,9 +13,19 @@ const ShowAvailability = () => {
     const navigate = useNavigate(); // for navigation
     const [currentMonth, setCurrentMonth] = useState(10); // Default to October
     const [currentYear] = useState(2024); // Fixed year
+    const [selectedShifts, setSelectedShifts] = useState([]);
     const [selectedDay, setSelectedDay] = useState([]);
-    const [shifts, setShifts] = useState([]); // Track selected day
-    // const[finalSelect,setFinalSelect]  = useState([]);
+
+    const [savedShifts, setSavedShifts] = useState([]);
+    const [isModalVisible, setIsModalVisible] = useState(false); // Modal state
+
+    const [activeShift, setActiveShift] = useState(null);
+    // Add the functionlaity that shows simple calender but on click expanded to larger showing tickets also
+    //  const [expandedDay, setExpandedDay] = useState(null);
+
+
+
+   
     useEffect(() => {
         // console.log("museumId:", museumId);
         // console.log("currentMonth:", currentMonth);
@@ -58,14 +68,46 @@ const ShowAvailability = () => {
         setSelectedDay(null);
     };
 
-    const handleDayClick = (dayAvailability) => {
-        setSelectedDay({ dayAvailability });
-    };
+    // const handleDayClick = (shifts,date) => {
+    //     setSelectedDay({shifts,date});
+    // };
 
     const handleSaveChanges = () => {
+        setIsModalVisible(true); // Show the confirmation modal
+    };
 
-        // Send selected date to booking page
-        navigate(`/booking/${museumId}`);
+    // const handleShiftClick = (shiftType, date) => {
+    //     setSavedShifts((prev) => [...prev, { date, shiftType }]);
+    //     setActiveShift({ shiftType, date }); 
+    //     console.log(savedShifts) // Save the shift and date
+    // };
+    // const handleShiftClick = (shiftType, date) => {
+    //     // Check if the shift is already selected
+    //     const shiftKey = `${shiftType}-${date}`;
+    //     if (selectedShifts.includes(shiftKey)) {
+    //         // If it's already selected, remove it
+    //         setSelectedShifts((prev) => prev.filter((shift) => shift !== shiftKey));
+    //     } else {
+    //         // Otherwise, add it
+    //         setSelectedShifts((prev) => [...prev, shiftKey]);
+    //     }
+    // };
+    const handleShiftClick = (shiftType, date) => {
+        // setSavedShifts((prev) => [...prev, { date, shiftType }]);
+        const shiftKey = `${shiftType}-${date}`;
+        if (selectedShifts.includes(shiftKey)) {
+            setSelectedShifts((prev) => {
+                const newShifts = prev.filter((shift) => shift !== shiftKey);
+                console.log('Removed shift:', shiftKey, 'New shifts:', newShifts);
+                return newShifts;
+            });
+        } else {
+            setSelectedShifts((prev) => {
+                const newShifts = [...prev, shiftKey];
+                console.log('Added shift:', shiftKey, 'New shifts:', newShifts);
+                return newShifts;
+            });
+        }
     };
 
     const renderDays = () => {
@@ -82,71 +124,131 @@ const ShowAvailability = () => {
             // Apply styles based on availability
             let dayClass = '';
             if (dayAvailability) {
-                if (!dayAvailability.is_closed) {
-                    dayClass = 'available-day'; // Yellow
-                } else {
-                    dayClass = 'closed-day'; // Red
-                }
+                dayClass = dayAvailability.is_closed ? 'closed-day' : 'available-day'; // Apply styles based on availability
             }
     
             // Fetch shifts for the day
             const morningShift = dayAvailability?.shifts.find(shift => shift.shift_type === 'Morning');
             const eveningShift = dayAvailability?.shifts.find(shift => shift.shift_type === 'Evening');
-    
+            // const isExpanded = expandedDay === dateString;
             return (
                 <div
                     key={day}
                     className={`calendar-day ${dayClass}`} // Main card for day and date
-                    onClick={() => handleDayClick(dayAvailability)}
+                    // onClick={() => handleDayClick(dayAvailability)}
+
                 >
                     <div className="day-header">
                         <div className="day-number">{day}</div>
                         <div className="day-name">{new Date(dateString).toLocaleString('default', { weekday: 'long' })}</div>
                     </div>
-                    <div className="shifts-container">
-                        <div className="shift-card morning-card">
-                            <div className="shift-title">Morning</div>
-                            <div className="available-tickets">
-                                {morningShift ? morningShift.tickets_available : 0} 
-                            </div>
-                        </div>
-                        <div className="shift-card evening-card">
-                            <div className="shift-title">Evening</div>
-                            <div className="available-tickets">
-                                {eveningShift ? eveningShift.tickets_available : 0}
-                            </div>
-                        </div>
-                    </div>
+                   
+                   {dayAvailability && !dayAvailability.is_closed && (
+    <div className="shifts-container">
+        <div 
+            className={`shift-card morning-card ${selectedShifts.includes(`Morning-${dateString}`) ? 'selected' : ''}`}
+            onClick={() => handleShiftClick('Morning', dateString)}
+        >
+            <div className="shift-title">M</div>
+            <div className="available-tickets">
+                {morningShift ? morningShift.tickets_available : 0} 
+            </div>
+        </div>
+        <div 
+           className={`shift-card evening-card ${selectedShifts.includes(`Evening-${dateString}`) ? 'selected' : ''}`}
+            onClick={() => handleShiftClick('Evening', dateString)}
+        >
+            <div className="shift-title">E</div>
+            <div className="available-tickets">
+                {eveningShift ? eveningShift.tickets_available : 0}
+            </div>
+        </div>
+    </div>
+)}
                 </div>
             );
     
         });
     
     };
+
+    const ConfirmationModal = ({ isVisible, onClose }) => {
+        if (!isVisible) return null;
+
+        return (
+            <div className="modal show" style={{ display: 'block' }}>
+                <div className="modal-dialog">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h5 className="modal-title">Confirm Your Shifts</h5>
+                            <button className="close" onClick={onClose}>
+                                <span>&times;</span>
+                            </button>
+                        </div>
+                        <div className="modal-body">
+                            <h5>Saved Shifts:</h5>
+                            <ul className="list-group">
+                                {selectedShifts.map((shift, index) => (
+                                    <li key={index} className="list-group-item">
+                                        {shift}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                        <div className="modal-footer">
+                            <button className="btn btn-secondary" onClick={onClose}>Cancel</button>
+                            <button
+                                className="btn btn-primary"
+                                onClick={() => {
+                                    navigate(`/booking/${museumId}`);
+                                    onClose();
+                                }}
+                            >
+                                Confirm and Proceed to Booking
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+    
     
     
 
     return (
         <div className="container mt-5">
             <h1 className="text-center mb-4">Availability Calendar for Museum : {museumId}</h1>
-
+ 
             <div className="d-flex justify-content-center align-items-center mb-4">
                 <button className="btn btn-secondary" onClick={handlePreviousMonth}>Previous Month</button>
                 <h2 className="mx-4">{months[currentMonth]} {currentYear}</h2>
                 <button className="btn btn-secondary" onClick={handleNextMonth}>Next Month</button>
             </div>
-
+            <h4>M-Morning , E-Evening</h4>
             <div className="calendar">
                 <div className="row">
                     {renderDays()}
                 </div>
             </div>
+            
+            {selectedShifts.length > 0 && (
+    <div className="fixed-bottom mb-3 text-center">
+        <button className="btn btn-primary" onClick={() => setIsModalVisible(true)}>
+            Final Save
+        </button>
+    </div>
+)}
 
-            {selectedDay && (
-                <div className="fixed-bottom mb-3 text-center">
-                    <button className="btn btn-primary" onClick={handleSaveChanges}>Final Save</button>
-                </div>
-            )}
+
+
+            {isModalVisible && (
+    <ConfirmationModal
+        isVisible={isModalVisible}
+        onClose={() => setIsModalVisible(false)}
+        onConfirm={handleSaveChanges}
+    />
+)}
         </div>
     );
 };
