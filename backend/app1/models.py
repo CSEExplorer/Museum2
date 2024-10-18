@@ -45,7 +45,7 @@ class Booking(models.Model):
     museum = models.ForeignKey(Museum, on_delete=models.CASCADE)
     date_of_visit = models.DateField()
     number_of_tickets = models.IntegerField()
-    shift = models.CharField(max_length=20,default="Morning")
+    
 
     def __str__(self):
         return f"{self.user.username} booked {self.number_of_tickets} tickets for {self.museum.name} on {self.date_of_visit}"

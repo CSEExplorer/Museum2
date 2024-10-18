@@ -383,50 +383,56 @@ def verify_payment(request):
     except Exception as e:
         return Response({'error': str(e)}, status=500)
     
-# ----------------------------------------confirm booking status------------------------------------------------------------ 
-from django.core.mail import EmailMessage
-from django.shortcuts import get_object_or_404
-from django.http import JsonResponse
-from django.utils import timezone
-from rest_framework.decorators import api_view
-
-from .models import Booking
-from app2.models import Museum,Shift # Import your Booking and Museum models
-from django.contrib.auth.models import User
+# ----------------------------------------confirm booking status  by sending mail ------------------------------------------------------------ 
 from io import BytesIO
-from xhtml2pdf import pisa
-from django.core.mail import send_mail, EmailMessage
 from django.template.loader import render_to_string
-
+from xhtml2pdf import pisa
+from django.core.mail import EmailMessage
+from django.http import JsonResponse
 import json
+from django.utils import timezone
+from django.shortcuts import get_object_or_404
+from .models import  Booking
+from app2.models import Museum
+
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 @csrf_exempt
 def confirm_booking_status(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)  # Parse JSON body
             email = data.get('email')
-            shift_id = data.get('shift_id')
-            museum_id  = data.get('id')
+            selectedShifts = data.get('selectedShifts')  # Get the full shift array
+            museum_id = data.get('id')
 
-            if not email or not shift_id or not museum_id:
+            # Validate the required fields
+            if not email or not selectedShifts or not museum_id:
                 return JsonResponse({'error': 'Missing required fields.'}, status=400)
 
+            # Fetch the user and museum objects
             user = get_object_or_404(User, email=email)
             museum = get_object_or_404(Museum, museum_id=museum_id)
-            shift = get_object_or_404(Shift, id=shift_id)
 
+            # Save the booking (you can also extend this logic to save the shifts separately)
             booking = Booking(
                 user=user,
-                shift=shift,
                 museum=museum,
-                date_of_visit=timezone.now().date(),  # Set this according to your booking logic
-                number_of_tickets=1  # Adjust this as necessary
+                date_of_visit=timezone.now().date(),  # Adjust if needed
+                number_of_tickets=len(selectedShifts)
             )
             booking.save()
 
-            html = render_to_string('ticket_template.html', {'museum': museum, 'shift': shift})
+            # Prepare the HTML template for the ticket
+            html = render_to_string('ticket_template.html', {
+                'user': user,
+                'museum': museum,
+                'selectedShifts': selectedShifts,
+                
+            })
 
-            # Generate PDF
+            # Generate PDF from HTML
             pdf_buffer = BytesIO()
             pisa_status = pisa.CreatePDF(html, dest=pdf_buffer)
 
@@ -436,10 +442,10 @@ def confirm_booking_status(request):
             pdf_buffer.seek(0)
             pdf_file = pdf_buffer.read()
 
-            # Send email with PDF attachment
+            # Send the email with the ticket PDF attached
             email_message = EmailMessage(
                 subject='Booking Confirmation',
-                body='Your ticket is attached as a PDF.',
+                body='Your ticket is attached as a PDF. Enjoy your visit!',
                 from_email='your_email@gmail.com',
                 to=[email],
             )
@@ -450,7 +456,8 @@ def confirm_booking_status(request):
 
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON.'}, status=400)
-
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
 # -----------------------------------------Availablity and shifts  By sending museumId and month-------------------------------------------------------
 # views.py
 
