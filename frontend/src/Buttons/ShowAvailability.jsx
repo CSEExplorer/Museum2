@@ -13,8 +13,9 @@ const ShowAvailability = () => {
     const navigate = useNavigate(); // for navigation
     const [currentMonth, setCurrentMonth] = useState(10); // Default to October
     const [currentYear] = useState(2024); // Fixed year
-    const [selectedDay, setSelectedDay] = useState(null); // Track selected day
-
+    const [selectedDay, setSelectedDay] = useState([]);
+    const [shifts, setShifts] = useState([]); // Track selected day
+    // const[finalSelect,setFinalSelect]  = useState([]);
     useEffect(() => {
         // console.log("museumId:", museumId);
         // console.log("currentMonth:", currentMonth);
@@ -57,11 +58,12 @@ const ShowAvailability = () => {
         setSelectedDay(null);
     };
 
-    const handleDayClick = (day, dateString) => {
-        setSelectedDay({ day, dateString });
+    const handleDayClick = (dayAvailability) => {
+        setSelectedDay({ dayAvailability });
     };
 
     const handleSaveChanges = () => {
+
         // Send selected date to booking page
         navigate(`/booking/${museumId}`);
     };
@@ -75,31 +77,54 @@ const ShowAvailability = () => {
     
         return currentMonthDays.map((day) => {
             const dateString = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-            // console.log(dateString)
             const dayAvailability = availability.find((avail) => avail.date === dateString);
-            // console.log(dayAvailability);
-            // Apply yellow for available days and red for closed days
+    
+            // Apply styles based on availability
             let dayClass = '';
             if (dayAvailability) {
                 if (!dayAvailability.is_closed) {
                     dayClass = 'available-day'; // Yellow
-                } else  {
+                } else {
                     dayClass = 'closed-day'; // Red
                 }
             }
     
+            // Fetch shifts for the day
+            const morningShift = dayAvailability?.shifts.find(shift => shift.shift_type === 'Morning');
+            const eveningShift = dayAvailability?.shifts.find(shift => shift.shift_type === 'Evening');
+    
             return (
                 <div
                     key={day}
-                    className={`calendar-day ${dayClass}`} // Apply class based on availability
-                    onClick={() => handleDayClick(day, dateString)}
+                    className={`calendar-day ${dayClass}`} // Main card for day and date
+                    onClick={() => handleDayClick(dayAvailability)}
                 >
-                    <div className="day-number">{day}</div>
-                    <div className="day-name">{new Date(dateString).toLocaleString('default', { weekday: 'long' })}</div>
+                    <div className="day-header">
+                        <div className="day-number">{day}</div>
+                        <div className="day-name">{new Date(dateString).toLocaleString('default', { weekday: 'long' })}</div>
+                    </div>
+                    <div className="shifts-container">
+                        <div className="shift-card morning-card">
+                            <div className="shift-title">Morning</div>
+                            <div className="available-tickets">
+                                {morningShift ? morningShift.tickets_available : 0} 
+                            </div>
+                        </div>
+                        <div className="shift-card evening-card">
+                            <div className="shift-title">Evening</div>
+                            <div className="available-tickets">
+                                {eveningShift ? eveningShift.tickets_available : 0}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             );
+    
         });
+    
     };
+    
+    
 
     return (
         <div className="container mt-5">

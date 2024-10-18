@@ -1,60 +1,98 @@
-.container {
-    max-width: 900px;
-    margin: 0 auto;
-  }
-  
-  .calendar {
-    display: flex;
-    flex-wrap: wrap;
-  }
-  
+.calendar-day {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px; /* Further reduced padding for the main card */
+  margin: 8px; /* Spacing between cards */
+  text-align: center;
+  background-color: #f9f9f9;
+  transition: transform 0.2s;
+  display: flex; /* Enable Flexbox */
+  flex-direction: column; /* Stack elements vertically */
+  justify-content: flex-start; /* Align items to the start */
+  height: 200px; /* Adjust height as needed */
+  width: 180px; /* Fixed width for main card */
+  position: relative; /* Position relative for inner cards */
+}
+
+.available-day {
+  background-color: yellow; /* Yellow for available days */
+}
+
+.calendar-day:hover {
+  transform: scale(1.05);
+}
+
+.day-header {
+  font-weight: bold;
+  margin-bottom: 8px; /* Reduced margin */
+}
+
+.day-number {
+  font-size: 28px; /* Font size for the day number */
+}
+
+.day-name {
+  font-size: 18px; /* Font size for the day name */
+}
+
+.shifts-container {
+  display: flex; /* Use Flexbox for inner cards */
+  flex-direction: row; /* Arrange inner cards horizontally */
+  justify-content: space-between; /* Space between inner cards */
+  margin-top: 8px; /* Space between header and shifts */
+  width: 100%; /* Full width for the shifts container */
+}
+
+.shift-card {
+  border: 1px solid #eaeaea;
+  border-radius: 5px;
+  padding: 8px; /* Padding for inner cards */
+  background-color: #fff;
+  height: 70px; /* Adjusted height for inner cards */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Slight shadow for depth */
+  display: flex; /* Enable Flexbox for inner cards */
+  flex-direction: column; /* Stack title and tickets vertically */
+  justify-content: center; /* Center content */
+  align-items: center; /* Center align items */
+  flex: 1; /* Allow cards to grow and fill space equally */
+  margin: 0 5px; /* Side margins for spacing */
+}
+
+.shift-title {
+  font-size: 14px; /* Font size for title */
+  font-weight: bold;
+  margin-bottom: 3px; /* Reduced margin */
+}
+
+.available-tickets {
+  color: #007bff; /* Bootstrap primary color */
+  font-weight: bold;
+  font-size: 12px; /* Font size for available tickets */
+}
+
+/* Additional styles for closed days */
+.closed-day {
+  background-color: #f8d7da; /* Light red for closed days */
+  border: 1px solid #f5c6cb; /* Darker border */
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
   .calendar-day {
-    flex-basis: calc(14.28% - 2%); /* Each day takes 1/7th of the row minus margins */
-    margin: 1%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    text-align: center;
-    transition: background-color 0.3s ease;
-  }
-  
-  .day-number {
-    font-size: 16px;
-    font-weight: bold;
-  }
-  
-  .day-name {
-    font-size: 12px;
-    color: #666;
-  }
-  
-  .available-day {
-    background-color: #d4edda; /* Light green for available days */
-  }
-  
-  .closed-day {
-    background-color: #f8d7da; /* Light red for closed days */
-  }
-  
-  .no-availability {
-    background-color: #f0f0f0;
-  }
-  
-  .calendar-day:hover {
-    background-color: #e9ecef;
-  }
-  
-  .d-flex {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+      width: 100%; /* Full width on smaller screens */
+      height: auto; /* Adjust height for flexibility */
   }
 
-  .available-day {
-    background-color: yellow; /* Yellow for available days */
+  .shift-card {
+      height: 50px; /* Adjust height of inner cards on small screens */
+      font-size: 12px; /* Adjust font size for smaller screens */
   }
-  
-  .closed-day {
-    background-color: red; /* Red for closed days */
+
+  .day-number {
+      font-size: 24px; /* Responsive font size */
   }
-  
+
+  .day-name {
+      font-size: 16px; /* Responsive font size */
+  }
+}
