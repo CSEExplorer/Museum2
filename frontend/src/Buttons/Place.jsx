@@ -5,7 +5,7 @@ import { Modal, Button } from 'react-bootstrap';
 
 const apiUrl = process.env.REACT_APP_API_URL;
 const mediaUrl = process.env.REACT_APP_MEDIA_URL;
-const Places = () => {
+const Places = ( {setMuseumDetails} ) => {
   const [museums, setMuseums] = useState([]);
 
   const [loading, setLoading] = useState(false);
@@ -25,6 +25,7 @@ const Places = () => {
         const response = await axios.get(`${apiUrl}/museums/city/?city=${city}`);
         
         setMuseums(response.data);
+
         
       } catch (err) {
         setError('Failed to fetch museums. Please try again.');
@@ -42,9 +43,13 @@ const Places = () => {
   };
  
  const handleBookTicket = (museum) => {
-  console.log('Selected Museum:', museum); // Check if museum object is valid
-  // navigate('/', { state: { museum } });
-    // Pass museum object in state
+  console.log('Selected Museum:', museum);
+  setMuseumDetails({
+     fare : museum.fare,
+     id :museum.museum_id,
+     name :museum.name
+  })
+  // console.log(setMuseumDetails);
     navigate(`/availability/${museum.museum_id}`);
 };
 

@@ -1,41 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useParams,useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Button, Form } from 'react-bootstrap';
+import { Button,Card, Form } from 'react-bootstrap';
 
 const apiUrl = process.env.REACT_APP_API_URL;
 const mediaUrl = process.env.REACT_APP_MEDIA_URL;
 const razorpayKey = process.env.REACT_APP_RAZORPAY_KEY;
-const Booking = () => {
+const Booking = ({museumDetails}) => {
+  // console.log(museumDetails);
+ 
   const location = useLocation();
+  const { museumId } = useParams();
   const navigate = useNavigate();
-  const { museum } = location.state || {};
-  const [shifts, setShifts] = useState([]);
-  const [selectedShift, setSelectedShift] = useState(null);
+  const { selectedShifts } = location.state || {};
+  
   const [email, setEmail] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    console.log('Received Museum in Booking:', museum);
-  }, [museum]);
-
+  const farePerShift =museumDetails.fare;
+  const totalFare =  selectedShifts.length * farePerShift;
+ 
 
   
-  useEffect(() => {
-    const fetchShifts = async () => {
-      try {
-        const response = await axios.get(`${apiUrl}/museums/${museum.museum_id}/shifts/`);
-        setShifts(response.data);
-      } catch (err) {
-        setError('Failed to fetch shifts. Please try again.');
-      }
-    };
 
-    if (museum) {
-      fetchShifts();
-    }
-  }, [museum]);
 
   const handlePayment = async (order) => {
     const { amount, id } = order;
@@ -48,7 +35,7 @@ const Booking = () => {
       key: razorpayKey,  // Razorpay Key ID from .env
       amount: amount,  // Amount in paise
       currency: "INR",
-      name: museum.name,
+      name: museumDetails.name,
       description: "Museum Ticket Booking",
       order_id: id,
       handler: async (response) => {
@@ -59,23 +46,33 @@ const Booking = () => {
             razorpay_order_id: response.razorpay_order_id,
             razorpay_signature: response.razorpay_signature,
             email: email,  // Include email to send booking confirmation
-            shift_id: selectedShift.id  // Use shift_id
           });
 
           console.log('Email sending process started...');
+          // console.log(totalFare);
           const emailResponse = await axios.post(`${apiUrl}/send_mail/`, {
             email: email,
-            shift_id: selectedShift.id,
-            id: museum.museum_id
+            selectedShifts: selectedShifts,
+            fare:totalFare,
+            id: museumId,
 
           });
 
           console.log('Email sent response:', emailResponse.data);
           navigate('/');
           alert('Payment successful! Booking confirmed.');
-        } catch (err) {
-                 
-        }
+        } catch (error) {
+          // Log the error response
+          if (error.response) {
+              console.error('Error response data:', error.response.data); // Log the response data
+              console.error('Error status:', error.response.status);
+              console.error('Error headers:', error.response.headers);
+          } else if (error.request) {
+              console.error('No response received:', error.request);
+          } else {
+              console.error('Error setting up request:', error.message);
+          }
+      }
       },
       prefill: {
         email: email,
@@ -91,8 +88,9 @@ const Booking = () => {
   };
 
   const handleConfirmBooking = async () => {
-    if (!selectedShift || !email) {
+    if (selectedShifts.length==0 || !email) {
       alert('Please select a shift and provide your email.');
+      navigate(`/availability/${museumId}`);
       return;
     }
 
@@ -107,17 +105,24 @@ const Booking = () => {
       }
 
       // Create Razorpay order
-      const response = await axios.post(`${apiUrl}/museums/${museum.museum_id}/create_order/`, {
-        amount: 5 * 100,  // Ensure amount is in paise (multiply by 100)
-        email: email,
-      }, {
-        headers: {
-          Authorization: `Token ${token}`,
-        }
-      });
+      try {
+        const response = await axios.post(`${apiUrl}/museums/${museumId}/create_order/`, {
+            amount: totalFare*100,
+            email: email,
+        }, {
+            headers: {
+                Authorization: `Token ${token}`,
+            }
+        });
+        console.log('Response:', response.data);
+        const order = response.data; 
+        handlePayment(order); // Log successful response
+    } catch (error) {
+        console.error('Error during order creation:', error.response ? error.response.data : error.message);
+    }
 
-      const order = response.data;  // Get order_id from the backend
-      handlePayment(order);  // Initiate payment
+       // Get order_id from the backend
+       // Initiate payment
     } catch (err) {
       console.error('Booking failed:', err);
       alert('Booking failed. Please try again.');
@@ -126,56 +131,79 @@ const Booking = () => {
     }
   };
 
-  return (
-    <div className="container">
-      {museum ? (
-        <>
-          <h1 className="mt-4">Book Ticket for {museum.name}</h1>
-          <h5>Select a Shift (Morning/Evening):</h5>
 
-          {shifts.length > 0 ? (
-            <ul className="list-group">
-              {shifts.map((shift) => (
-                <li
-                  key={shift.shift_type}
-                  className={`list-group-item ${selectedShift && selectedShift.shift_type === shift.shift_type ? 'active' : ''}`}
-                  onClick={() => setSelectedShift(shift)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  {shift.shift_type.charAt(0).toUpperCase() + shift.shift_type.slice(1)} Shift (Tickets Available: {shift.tickets_available})
+const handleCancelBooking = () => {
+  navigate(`/availability/${museumId}`);
+};
+
+
+
+return (
+  <div className="container mt-5">
+    {selectedShifts && selectedShifts.length > 0 ? (
+      <>
+        <h1 className="mb-4 text-center">Confirm Your Booking</h1>
+        <Card className="p-4 shadow-sm">
+          <Card.Body>
+            <h3 className="mb-3">Museum: <span className="text-primary">{museumDetails.name}</span></h3>
+
+            {/* Selected Shifts */}
+            <h5 className="mb-3">Selected Shifts:</h5>
+            <ul className="list-group mb-4">
+              {selectedShifts.map((shift, index) => (
+                <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
+                  {shift}
+                  <span className="badge bg-primary text-white">Selected</span>
                 </li>
               ))}
             </ul>
-          ) : (
-            <p>No available shifts</p>
-          )}
 
-          <Form.Group className="mb-3" controlId="formEmail">
-            <Form.Label>Email address</Form.Label>
-            <Form.Control
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </Form.Group>
+            {/* Total Fare */}
+            <Card className="p-3 mb-4">
+              <h4 className="text-center mb-0">Total Fare</h4>
+              <h2 className="text-center text-success">₹{totalFare}</h2>
+            </Card>
 
-          <Button
-            variant="primary"
-            onClick={handleConfirmBooking}
-            disabled={!selectedShift || !email || loading}
-          >
-            {loading ? 'Booking...' : 'Book Ticket'}
-          </Button>
-        </>
-      ) : (
-        <p>No museum selected</p>
-      )}
+            {/* Email Input */}
+            <Form.Group className="mb-3" controlId="formEmail">
+              <Form.Label>Email address</Form.Label>
+              <Form.Control
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="p-3"
+              />
+            </Form.Group>
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-    </div>
-  );
+            {/* Action Buttons */}
+            <div className="d-flex justify-content-between mt-4">
+              <Button
+                variant="danger"
+                className="px-4 py-2"
+                onClick={handleCancelBooking} // Cancel action
+              >
+                Cancel
+              </Button>
+
+              <Button
+                variant="primary"
+                className="px-4 py-2"
+                onClick={handleConfirmBooking} // Confirm and Pay action
+                disabled={!email || loading}
+              >
+                {loading ? 'Processing...' : 'Confirm and Pay'}
+              </Button>
+            </div>
+          </Card.Body>
+        </Card>
+      </>
+    ) : (
+      <p>No shifts selected</p>
+    )}
+  </div>
+);
 };
 
 export default Booking;

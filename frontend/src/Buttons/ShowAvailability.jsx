@@ -15,22 +15,15 @@ const ShowAvailability = () => {
     const [currentYear] = useState(2024); // Fixed year
     const [selectedShifts, setSelectedShifts] = useState([]);
     const [selectedDay, setSelectedDay] = useState([]);
-
-    const [savedShifts, setSavedShifts] = useState([]);
     const [isModalVisible, setIsModalVisible] = useState(false); // Modal state
 
-    const [activeShift, setActiveShift] = useState(null);
-    // Add the functionlaity that shows simple calender but on click expanded to larger showing tickets also
-    //  const [expandedDay, setExpandedDay] = useState(null);
+
 
 
 
    
     useEffect(() => {
-        // console.log("museumId:", museumId);
-        // console.log("currentMonth:", currentMonth);
-        // Fetch availability from the backend
-        // console.log(`${apiUrl}/museums/${museumId}/availabilities/${currentMonth}/`); // Log the URL
+       
         const fetchAvailability = async () => {
             try {
                 const response = await axios.get(`${apiUrl}/museums/${museumId}/availabilities/${currentMonth+1}/`);
@@ -68,43 +61,25 @@ const ShowAvailability = () => {
         setSelectedDay(null);
     };
 
-    // const handleDayClick = (shifts,date) => {
-    //     setSelectedDay({shifts,date});
-    // };
+  
 
     const handleSaveChanges = () => {
         setIsModalVisible(true); // Show the confirmation modal
     };
 
-    // const handleShiftClick = (shiftType, date) => {
-    //     setSavedShifts((prev) => [...prev, { date, shiftType }]);
-    //     setActiveShift({ shiftType, date }); 
-    //     console.log(savedShifts) // Save the shift and date
-    // };
-    // const handleShiftClick = (shiftType, date) => {
-    //     // Check if the shift is already selected
-    //     const shiftKey = `${shiftType}-${date}`;
-    //     if (selectedShifts.includes(shiftKey)) {
-    //         // If it's already selected, remove it
-    //         setSelectedShifts((prev) => prev.filter((shift) => shift !== shiftKey));
-    //     } else {
-    //         // Otherwise, add it
-    //         setSelectedShifts((prev) => [...prev, shiftKey]);
-    //     }
-    // };
     const handleShiftClick = (shiftType, date) => {
-        // setSavedShifts((prev) => [...prev, { date, shiftType }]);
+       
         const shiftKey = `${shiftType}-${date}`;
         if (selectedShifts.includes(shiftKey)) {
             setSelectedShifts((prev) => {
                 const newShifts = prev.filter((shift) => shift !== shiftKey);
-                console.log('Removed shift:', shiftKey, 'New shifts:', newShifts);
+                
                 return newShifts;
             });
         } else {
             setSelectedShifts((prev) => {
                 const newShifts = [...prev, shiftKey];
-                console.log('Added shift:', shiftKey, 'New shifts:', newShifts);
+              
                 return newShifts;
             });
         }
@@ -200,7 +175,7 @@ const ShowAvailability = () => {
                             <button
                                 className="btn btn-primary"
                                 onClick={() => {
-                                    navigate(`/booking/${museumId}`);
+                                    navigate(`/booking/${museumId}` , { state: { selectedShifts } });
                                     onClose();
                                 }}
                             >
