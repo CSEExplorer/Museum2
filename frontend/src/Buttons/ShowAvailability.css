@@ -1,0 +1,60 @@
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  
+  .calendar {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .calendar-day {
+    flex-basis: calc(14.28% - 2%); /* Each day takes 1/7th of the row minus margins */
+    margin: 1%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    text-align: center;
+    transition: background-color 0.3s ease;
+  }
+  
+  .day-number {
+    font-size: 16px;
+    font-weight: bold;
+  }
+  
+  .day-name {
+    font-size: 12px;
+    color: #666;
+  }
+  
+  .available-day {
+    background-color: #d4edda; /* Light green for available days */
+  }
+  
+  .closed-day {
+    background-color: #f8d7da; /* Light red for closed days */
+  }
+  
+  .no-availability {
+    background-color: #f0f0f0;
+  }
+  
+  .calendar-day:hover {
+    background-color: #e9ecef;
+  }
+  
+  .d-flex {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .available-day {
+    background-color: yellow; /* Yellow for available days */
+  }
+  
+  .closed-day {
+    background-color: red; /* Red for closed days */
+  }
+  

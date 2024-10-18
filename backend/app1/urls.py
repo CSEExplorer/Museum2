@@ -1,6 +1,6 @@
 from . import views
 from django.urls import path,include
-from .views import signup,logout_view,get_user_profile,login_view_emailotp,verify_otp,museum_list,book_ticket,get_museum_shifts,verify_payment,create_order,confirm_booking_status
+from .views import signup,logout_view,get_user_profile,login_view_emailotp,verify_otp,museum_list,book_ticket,get_museum_shifts,verify_payment,create_order,confirm_booking_status,AvailabilityByMonthView
 
 
 
@@ -16,6 +16,7 @@ urlpatterns=[
     path('api/museums/<int:museum_id>/create_order/', create_order, name='create_order'),
     path('api/verify_payment/', verify_payment, name='verify_payment'),
     path('api/send_mail/' ,confirm_booking_status,name='send_mail'),
+    path('api/museums/<int:museumId>/availabilities/<int:currentMonth>/', AvailabilityByMonthView.as_view(), name='availabilities-by-month'),
     
 ]
 

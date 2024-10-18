@@ -24,6 +24,7 @@ import { RoleProvider } from './contexts/RoleProvider';
 import Availability from './Component/Availaiblity';
 import { MuseumProvider } from './contexts/MuseumContext'; 
 import MuseumAvailability from './Component/MuseumAvailabilities';
+import ShowAvailability from './Buttons/ShowAvailability';
 
 function App() {
    const [profile, setProfile] = useState({
@@ -52,7 +53,7 @@ function App() {
         <Route path="/tickets" element={<Tickets />} />
         <Route path="/explore" element={<Explore />} />
         <Route path="/availabilities" element={<Availability />} />
-
+        <Route path="/availability/:museumId" element={<ShowAvailability/>} />
         {/* Museum Owner Routes */}
             <Route path="/museum-signup" element={<SignupMuseum />} />
             <Route path="/museumavailabilities" element={<MuseumAvailability uniqueId={uniqueId} />} />

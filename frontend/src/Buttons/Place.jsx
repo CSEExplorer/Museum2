@@ -23,6 +23,7 @@ const Places = () => {
 
       try {
         const response = await axios.get(`${apiUrl}/museums/city/?city=${city}`);
+        
         setMuseums(response.data);
         
       } catch (err) {
@@ -42,7 +43,9 @@ const Places = () => {
  
  const handleBookTicket = (museum) => {
   console.log('Selected Museum:', museum); // Check if museum object is valid
-  navigate('/booking', { state: { museum } });  // Pass museum object in state
+  // navigate('/', { state: { museum } });
+    // Pass museum object in state
+    navigate(`/availability/${museum.museum_id}`);
 };
 
   return (

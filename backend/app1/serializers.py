@@ -96,3 +96,20 @@ class SignUpSerializer(serializers.ModelSerializer):
         return user
 
 
+# ---------------------------------------serializers for Availiblity by month --------------------------------------    
+# serializers.py
+
+from rest_framework import serializers
+from app2.models import Availability, Shift
+
+class ShiftSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Shift
+        fields = ['shift_type', 'tickets_available']  # Fields to return in the response
+
+class AvailabilitySerializer(serializers.ModelSerializer):
+    shifts = ShiftSerializer(many=True)  # Include the shifts in the response
+
+    class Meta:
+        model = Availability
+        fields = ['date', 'day', 'opening_time', 'closing_time', 'is_closed', 'shifts']

@@ -450,3 +450,28 @@ def confirm_booking_status(request):
 
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON.'}, status=400)
+
+# -----------------------------------------Availablity and shifts  By sending museumId and month-------------------------------------------------------
+# views.py
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.db.models.functions import ExtractMonth
+from app2.models import Availability
+from .serializers import AvailabilitySerializer
+
+class AvailabilityByMonthView(APIView):
+    def get(self, request,museumId, currentMonth, *args, **kwargs):
+        try:
+            # Filter availabilities by month using the date field
+            # availabilities = Availability.objects.annotate(month=ExtractMonth('date')).filter(month=currentMonth)
+            availabilities = Availability.objects.annotate(month=ExtractMonth('date')).filter(month=currentMonth, museum_id=museumId)
+            
+            # print(availabilities)
+            # Serialize the availabilities
+            serializer = AvailabilitySerializer(availabilities, many=True)
+            
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
