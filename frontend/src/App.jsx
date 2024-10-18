@@ -32,7 +32,14 @@ function App() {
         username: '',
         email: '',
    });
-   const [uniqueId, setUniqueId] = useState(null); 
+   const [uniqueId, setUniqueId] = useState(null);
+   const[museumDetails,setMuseumDetails]  = useState({
+      fare : 1,
+      id : '',
+      name :'',
+
+      
+   });
 
   return (
     <RoleProvider>
@@ -44,10 +51,10 @@ function App() {
         <Route path="/" element={<><Cart /><Advertisement /><Review /></>} />
         <Route path="/information" element={<Information />} />
         <Route path="/login" element={<Login />}  />
-        <Route path="/places" element={<Places />} />
+        <Route path="/places" element={<Places setMuseumDetails={setMuseumDetails}/>} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/help" element={<Help />} />
-        <Route path="/booking" element={<Booking />} />
+        <Route path="/booking/:museumId" element={<Booking museumDetails={museumDetails}/>} />
         <Route path="/history" element={<History />} />
         <Route path="/profile" element={<ProfileAccount setProfile={setProfile} />} />
         <Route path="/tickets" element={<Tickets />} />
