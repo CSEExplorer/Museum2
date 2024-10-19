@@ -191,9 +191,7 @@ else:
     # Use the local path for development
     GOOGLE_APPLICATION_CREDENTIALS = os.path.join(BASE_DIR, 'service_account_keys', 'service-account-file.json')
 
-# Validate the path
-if GOOGLE_APPLICATION_CREDENTIALS is None or not os.path.isfile(GOOGLE_APPLICATION_CREDENTIALS):
-    raise ValueError("Google Application Credentials are not set or file not found.")
+
 
 
 # Any other necessary configurations...
