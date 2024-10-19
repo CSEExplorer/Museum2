@@ -181,17 +181,21 @@ GCS_BUCKET_NAME = 'museum-profile-images-2024'
 
 import os
 import json
+import tempfile
 # Check if the application is running on Render (production)
 is_render = os.environ.get('RENDER', 'false') == 'true'
 
 if is_render:
-    # Use the environment variable for production
-    GOOGLE_APPLICATION_CREDENTIALS = json.loads(os.environ['GOOGLE_SERVICE_ACCOUNT_JSON'])
+    service_account_info = json.loads(os.environ['GOOGLE_SERVICE_ACCOUNT_JSON'])
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.json') as temp_file:
+        temp_file.write(json.dumps(service_account_info).encode())
+        GOOGLE_APPLICATION_CREDENTIALS = temp_file.name
+
 else:
     # Use the local path for development
     GOOGLE_APPLICATION_CREDENTIALS = os.path.join(BASE_DIR, 'service_account_keys', 'service-account-file.json')
 
-
+    
 
 
 # Any other necessary configurations...
