@@ -178,8 +178,23 @@ from google.oauth2 import service_account
 
 GCS_BUCKET_NAME = 'museum-profile-images-2024'
 
-# Path to your service account key JSON file
-GOOGLE_APPLICATION_CREDENTIALS =os.path.join(BASE_DIR, 'service_account_keys', 'service-account-file.json')
+
+import os
+
+# Check if the application is running on Render (production)
+is_render = os.environ.get('RENDER', 'false') == 'true'
+
+if is_render:
+    # Use the environment variable for production
+    GOOGLE_APPLICATION_CREDENTIALS = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
+else:
+    # Use the local path for development
+    GOOGLE_APPLICATION_CREDENTIALS = os.path.join(BASE_DIR, 'service_account_keys', 'service-account-file.json')
+
+# Validate the path
+if GOOGLE_APPLICATION_CREDENTIALS is None or not os.path.isfile(GOOGLE_APPLICATION_CREDENTIALS):
+    raise ValueError("Google Application Credentials are not set or file not found.")
+
 
 # Any other necessary configurations...
 

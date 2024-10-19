@@ -9,3 +9,6 @@ def upload_file_to_gcs(file, bucket_name, destination_blob_name=None):
      
     blob.upload_from_file(file)
     return blob.public_url
+
+
+
