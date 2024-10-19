@@ -55,7 +55,7 @@ const ProfileAccount = ({ setProfile}) => {
                 setFormData(response.data);
 
                 if (response.data.profile_image && !localProfileImage) {
-                    const imageUrl = `${mediaUrl}${response.data.profile_image}`;
+                    const imageUrl = response.data.profile_image ;
                     setImagePreview(imageUrl);
                     localStorage.setItem('profile_image_url', imageUrl);
                     setProfile((prev) => ({
