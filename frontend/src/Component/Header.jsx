@@ -178,7 +178,7 @@ const Header = ({ profile}) => {
               >
                 {profile && profile.profile_image ? (
                   <img
-                    src={`${mediaUrl}${profile.profile_image}`}
+                    src={profile.profile_image}
                     alt="Profile"
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }} // Circular and responsive image
                   />

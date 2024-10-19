@@ -168,3 +168,18 @@ EMAIL_HOST_PASSWORD="wxrt cmsd uvbc azwe"
 
 RAZORPAY_KEY_ID = 'rzp_test_qRwrfdLBNDfLRV'
 RAZORPAY_KEY_SECRET = 'kjlZAL5kpTnQaRU1GI2YTpI5'
+
+
+
+
+import os
+from google.oauth2 import service_account
+
+
+GCS_BUCKET_NAME = 'museum-profile-images-2024'
+
+# Path to your service account key JSON file
+GOOGLE_APPLICATION_CREDENTIALS =os.path.join(BASE_DIR, 'service_account_keys', 'service-account-file.json')
+
+# Any other necessary configurations...
+

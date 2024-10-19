@@ -30,5 +30,8 @@ Thumbs.db
 *.temp
 
 
+service_account_keys
+
+
 # Ignore ProfileContext
 src/contexts/ProfileContext.jsx

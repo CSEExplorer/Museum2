@@ -101,6 +101,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from .models import UserProfile
 from .serializers import UserProfileSerializer
+from .utils import upload_file_to_gcs
 
 @api_view(['GET', 'PUT'])
 @authentication_classes([TokenAuthentication])
@@ -119,10 +120,27 @@ def get_user_profile(request):
     
     if request.method == 'PUT':
         # Handle PUT request
-        serializer = UserProfileSerializer(profile, data=request.data, partial=True)  # `partial=True` allows partial updates
+        serializer = UserProfileSerializer(profile, data=request.data, partial=True) 
+        # print(request.FILES['profile_image'])
+        print("Incoming data:", request.data)
+        
+        if 'profile_image' in request.FILES:
+                file_obj = request.FILES['profile_image']
+                
+                # Define the destination blob name (path) in the GCS bucket
+                destination_blob_name = f"profiles/{request.user.id}/{file_obj}"
+                
+                # Upload the file to Google Cloud Storage
+                profile_image_url = upload_file_to_gcs(file_obj, bucket_name='museum-profile-images-2024', destination_blob_name=destination_blob_name)
+                print("Uploaded image URL:", profile_image_url)
+
+                # Update the profile with the new image URL
+                request.data['profile_image'] = profile_image_url
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
+                serializer.save()
+                return Response(serializer.data)
+        
+        print("Serializer errors:", serializer.errors)
         return Response(serializer.errors, status=400)
     
 

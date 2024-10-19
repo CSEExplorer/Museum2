@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-const BASE_URL = 'https://museum-rr68.onrender.com';
+
 const apiUrl = process.env.REACT_APP_API_URL; 
 const mediaUrl = process.env.REACT_APP_MEDIA_URL;
 // import { useProfile } from '../contexts/ProfileContext';
@@ -20,7 +20,11 @@ const ProfileAccount = ({ setProfile}) => {
     const [formData, setFormData] = useState({ ...userDetails });
     const [selectedImage, setSelectedImage] = useState(null);
     const [imagePreview, setImagePreview] = useState('');
+    const localProfileImage = localStorage.getItem('profile_image_url');
+    console.log('Image from local storage:', localProfileImage);
+
     // const {setProfile } = useProfile();
+    
   
 
     useEffect(() => {
@@ -31,27 +35,39 @@ const ProfileAccount = ({ setProfile}) => {
                     setError('User is not authenticated');
                     return;
                 }
+
+                const localProfileImage = localStorage.getItem('profile_image_url');
+                if (localProfileImage) {
+                    setImagePreview(localProfileImage);
+                    setProfile((prev) => ({
+                        ...prev,
+                        profile_image: localProfileImage,
+                    }));
+                }
+
                 const response = await axios.get(`${apiUrl}/user/profile/`, {
                     headers: {
                         Authorization: `Token ${token}`,
                     },
                 });
+
                 setUserDetails(response.data);
                 setFormData(response.data);
 
-                if (response.data.profile_image) {
-                    setImagePreview(`${mediaUrl}${response.data.profile_image}`);
+                if (response.data.profile_image && !localProfileImage) {
+                    const imageUrl = `${mediaUrl}${response.data.profile_image}`;
+                    setImagePreview(imageUrl);
+                    localStorage.setItem('profile_image_url', imageUrl);
                     setProfile((prev) => ({
-            ...prev,
-            profile_image:response.data.profile_image || formData.profile_image, // Update with new image URL
-        }));
+                        ...prev,
+                        profile_image: imageUrl,
+                    }));
                 }
             } catch (error) {
                 console.error('Failed to fetch user details:', error);
                 setError('Could not load user details. Please try again later.');
             }
         };
-
         fetchUserDetails();
     }, []);
 
@@ -96,10 +112,12 @@ const ProfileAccount = ({ setProfile}) => {
                 },
             });
             setUserDetails(formData);
+            const newProfileImageUrl = response.data.profile_image || formData.profile_image;
+            localStorage.setItem('profile_image_url', newProfileImageUrl);
             setProfile((prev) => ({
-            ...prev,
-            profile_image:response.data.profile_image || formData.profile_image, // Update with new image URL
-        }));
+                ...prev,
+                profile_image: newProfileImageUrl,
+            }));
             setEditMode(false);
             setError('');
         } catch (error) {

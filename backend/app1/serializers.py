@@ -9,7 +9,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     # Include fields from the related User model
     username = serializers.ReadOnlyField(source='user.username')
     email = serializers.ReadOnlyField(source='user.email')
-
+    profile_image = serializers.URLField(required=False)
     class Meta:
         model = UserProfile
         fields = ['username', 'email', 'phone_number', 'address', 'city', 'state','profile_image']
