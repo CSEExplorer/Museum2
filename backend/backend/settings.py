@@ -180,13 +180,13 @@ GCS_BUCKET_NAME = 'museum-profile-images-2024'
 
 
 import os
-
+import json
 # Check if the application is running on Render (production)
 is_render = os.environ.get('RENDER', 'false') == 'true'
 
 if is_render:
     # Use the environment variable for production
-    GOOGLE_APPLICATION_CREDENTIALS = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
+    GOOGLE_APPLICATION_CREDENTIALS = json.loads(os.environ['GOOGLE_SERVICE_ACCOUNT_JSON'])
 else:
     # Use the local path for development
     GOOGLE_APPLICATION_CREDENTIALS = os.path.join(BASE_DIR, 'service_account_keys', 'service-account-file.json')
