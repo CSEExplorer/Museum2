@@ -80,11 +80,24 @@ const ProfileAccount = ({ setProfile}) => {
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
+    // const handleImageChange = (e) => {
+    //     const file = e.target.files[0];
+    //     setSelectedImage(file);
+    //     setImagePreview(URL.createObjectURL(file));
+    // };
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         setSelectedImage(file);
-        setImagePreview(URL.createObjectURL(file));
+        
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result); // Set the base64 result for preview
+            };
+            reader.readAsDataURL(file); // Read the file as a data URL
+        }
     };
+    
 
     const handleSave = async () => {
         try {
