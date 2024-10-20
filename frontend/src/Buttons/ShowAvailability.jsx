@@ -192,7 +192,8 @@ const ShowAvailability = () => {
     
 
     return (
-        <div className="container mt-5">
+        
+        <div className="container mt-75">
             <h1 className="text-center mb-4">Availability Calendar for Museum : {museumId}</h1>
  
             <div className="d-flex justify-content-center align-items-center mb-4">
@@ -213,6 +214,7 @@ const ShowAvailability = () => {
             Final Save
         </button>
     </div>
+    
 )}
 
 
@@ -225,7 +227,9 @@ const ShowAvailability = () => {
     />
 )}
         </div>
+        
     );
 };
+
 
 export default ShowAvailability;

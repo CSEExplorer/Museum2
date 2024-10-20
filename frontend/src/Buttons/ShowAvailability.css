@@ -1,3 +1,4 @@
+
 .calendar-day {
   border: 1px solid #ccc;
   border-radius: 8px;
@@ -9,13 +10,15 @@
   display: flex; /* Enable Flexbox */
   flex-direction: column; /* Stack elements vertically */
   justify-content: flex-start; /* Align items to the start */
-  height: 200px; /* Adjust height as needed */
-  width: 180px; /* Fixed width for main card */
+  height: 110px;
+  /* height:200px Adjust height as needed */
+  width: 130px; /* Fixed width for main card */
   position: relative; /* Position relative for inner cards */
 }
 
 .available-day {
-  background-color: yellow; /* Yellow for available days */
+  background-color: yellow;
+  /* padding: 15px;; Yellow for available days */
 }
 
 .calendar-day:hover {
@@ -28,11 +31,11 @@
 }
 
 .day-number {
-  font-size: 28px; /* Font size for the day number */
+  font-size: 12px; /* Font size for the day number */
 }
 
 .day-name {
-  font-size: 18px; /* Font size for the day name */
+  font-size: 12px; /* Font size for the day name */
 }
 
 .shifts-container {
@@ -44,18 +47,18 @@
 }
 
 .shift-card {
-  border: 1px solid #eaeaea;
-  border-radius: 5px;
-  padding: 8px; /* Padding for inner cards */
+  border: 1px solid black;
+  border-radius: 2px;
+  padding: 10px; /* Padding for inner cards */
   background-color: #fff;
-  height: 70px; /* Adjusted height for inner cards */
+  height: 40px; /* Adjusted height for inner cards */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Slight shadow for depth */
   display: flex; /* Enable Flexbox for inner cards */
   flex-direction: column; /* Stack title and tickets vertically */
   justify-content: center; /* Center content */
   align-items: center; /* Center align items */
   flex: 1; /* Allow cards to grow and fill space equally */
-  margin: 0 5px; /* Side margins for spacing */
+  margin: 5px; /* Side margins for spacing */
 }
 
 .shift-title {
@@ -84,8 +87,8 @@
   }
 
   .shift-card {
-      height: 50px; /* Adjust height of inner cards on small screens */
-      font-size: 12px; /* Adjust font size for smaller screens */
+      height: 40px; /* Adjust height of inner cards on small screens */
+      font-size: 11px; /* Adjust font size for smaller screens */
   }
 
   .day-number {
@@ -103,3 +106,5 @@
   border: 2px solid #f50057; /* Optional: Add a border to distinguish the selected shift */
   color: white; /* Optional: Change text color for contrast */ /* Text color when selected */
 }
+
+
