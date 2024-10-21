@@ -50,6 +50,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -186,6 +187,7 @@ import tempfile
 is_render = os.environ.get('RENDER', 'false') == 'true'
 
 if is_render:
+    print("i am here in production in settings")
     service_account_info = json.loads(os.environ['GOOGLE_SERVICE_ACCOUNT_JSON'])
     with tempfile.NamedTemporaryFile(delete=False, suffix='.json') as temp_file:
         temp_file.write(json.dumps(service_account_info).encode())
