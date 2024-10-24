@@ -50,12 +50,14 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+     'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -63,14 +65,19 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'backend.urls'
 
-CORS_ALLOW_ALL_ORIGINS = True 
+CORS_ALLOW_ALL_ORIGIN=False
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://museum-rr68.onrender.com",
     "http://museum-rr68.onrender.com",  # If HTTP access is possible
 ]
+
 CORS_ALLOW_CREDENTIALS = True
+
+# settings.py
+CSRF_TRUSTED_ORIGINS = ['http://localhost:3000']
+
 
 
 TEMPLATES = [
@@ -187,7 +194,7 @@ import tempfile
 is_render = os.environ.get('RENDER', 'false') == 'true'
 
 if is_render:
-    print("i am here in production in settings")
+    # print("i am here in production in settings")
     service_account_info = json.loads(os.environ['GOOGLE_SERVICE_ACCOUNT_JSON'])
     with tempfile.NamedTemporaryFile(delete=False, suffix='.json') as temp_file:
         temp_file.write(json.dumps(service_account_info).encode())
@@ -196,6 +203,17 @@ if is_render:
 else:
     # Use the local path for development
     GOOGLE_APPLICATION_CREDENTIALS = os.path.join(BASE_DIR, 'service_account_keys', 'service-account-file.json')
+
+
+
+import os
+
+# Add a DOMAIN setting that will change based on the environment
+if os.getenv('DJANGO_ENV') == 'production':
+    DOMAIN = 'museum-frontend.onrender.com'
+    print('DOMAIN')
+else:
+    DOMAIN = 'localhost:3000'
 
     
 

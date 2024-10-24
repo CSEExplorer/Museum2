@@ -16,6 +16,7 @@
     "axios": "^1.7.7",
     "bootstrap": "^5.3.3",
     "dialogflow": "^1.2.0",
+    "js-cookie": "^3.0.5",
     "museum-frontend": "file:",
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.5",

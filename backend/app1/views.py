@@ -500,3 +500,106 @@ class AvailabilityByMonthView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+# -------------------------------------------------------password_reset_email functionality ------------------------------------------------------------------------------
+
+
+
+import json
+from django.shortcuts import render
+from django.core.mail import send_mail
+from django.contrib.auth import get_user_model
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.utils.crypto import get_random_string
+from django.utils.translation import gettext as _
+from django.http import JsonResponse
+from django.contrib.sites.shortcuts import get_current_site
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.tokens import default_token_generator
+from django.conf import settings
+User = get_user_model()
+
+@csrf_exempt
+def password_reset_request(request):
+    if request.method == "POST":
+        try:
+            # Try to parse the request body as JSON
+            data = json.loads(request.body)
+            email = data.get('email')
+            print(email)  # Log the email to ensure it's coming through correctly
+
+            # Check if email exists in the database
+            try:
+                user = User.objects.get(email__iexact=email)
+                print(user)
+
+                # Generate token and UID
+                uid = urlsafe_base64_encode(force_bytes(user.pk))
+                token = default_token_generator.make_token(user)
+
+                # Construct password reset URL
+                
+                reset_url = f"http://{settings.DOMAIN}/reset-password/{uid}/{token}/"
+                # Send the password reset email
+                subject = _("Password Reset Request")
+                message = render_to_string('password_reset_email.html', {
+                    'user': user,
+                    'reset_url': reset_url,
+                })
+                send_mail(subject, message, 'no-reply@yourdomain.com', [user.email])
+
+                return JsonResponse({"status": "Password reset link sent to your email."})
+            except User.DoesNotExist:
+                return JsonResponse({"error": "Email not found."}, status=400)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON data."}, status=400)
+
+    
+
+
+# -----------------------------------------password_reset_confirm----------------------------------------------------------------------------------------------------
+from django.utils.http import urlsafe_base64_decode
+from django.http import JsonResponse
+from django.contrib.auth.models import User
+from django.contrib.auth.tokens import default_token_generator
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import get_user_model
+User = get_user_model()
+
+
+@csrf_exempt
+
+def password_reset_confirm(request, uidb64, token):
+    
+    try:
+        # Decode user ID from the base64 encoded string
+        uid = urlsafe_base64_decode(uidb64).decode()
+        
+        user = User.objects.get(pk=uid)
+        print(f"UID: {uid}, Token: {token}")
+    except (User.DoesNotExist, ValueError, TypeError):
+        # print(uidb64+" "+token)
+        return JsonResponse({"error": "Invalid token or user ID."}, status=400)
+
+    # Check if the token is valid for the user
+    if default_token_generator.check_token(user, token):
+        if request.method == "POST":
+            data = json.loads(request.body)
+            new_password = data.get('password')
+            
+
+            if new_password:
+               
+                    # Reset password
+                    user.set_password(new_password)
+                    user.save()
+                    return JsonResponse({"message": "Password reset successful."}, status=200)
+               
+            else:
+                return JsonResponse({"error": "Both password fields are required."}, status=400)
+    else:
+        # Token is invalid or expired
+        return JsonResponse({"error": "Invalid token or request."}, status=400)
+

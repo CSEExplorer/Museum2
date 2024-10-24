@@ -5,7 +5,9 @@ const apiUrl = process.env.REACT_APP_API_URL;
 
 const Signup = () => {
     // State variables for form fields
-    const [name, setName] = useState('');
+    const [username, setUserName] = useState('');
+    const[Firstname,setfirstname] = useState('');
+    const[Lastname,setlastname] = useState('')
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -92,7 +94,7 @@ const Signup = () => {
                         type="text"
                         className="form-control"
                         id="exampleInputName"
-                        placeholder="Enter your name"
+                        placeholder="Enter Fisrt name"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                     />

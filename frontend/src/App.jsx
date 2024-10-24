@@ -25,7 +25,8 @@ import Availability from './Component/Availaiblity';
 import { MuseumProvider } from './contexts/MuseumContext'; 
 import MuseumAvailability from './Component/MuseumAvailabilities';
 import ShowAvailability from './Buttons/ShowAvailability';
-
+import ForgetPassword from './Buttons/ForgetPassword';
+import ResetPassword from './Buttons/ResetPassword';
 function App() {
    const [profile, setProfile] = useState({
         profile_image: '',
@@ -61,9 +62,10 @@ function App() {
         <Route path="/explore" element={<Explore />} />
         <Route path="/availabilities" element={<Availability />} />
         <Route path="/availability/:museumId" element={<ShowAvailability/>} />
-        {/* Museum Owner Routes */}
-            <Route path="/museum-signup" element={<SignupMuseum />} />
-            <Route path="/museumavailabilities" element={<MuseumAvailability uniqueId={uniqueId} />} />
+        <Route path="/reset-password/:uid/:token" element={<ResetPassword/>} />
+        <Route path="/forget-password"  element={<ForgetPassword/>} />
+        <Route path="/museum-signup" element={<SignupMuseum />} />
+        <Route path="/museumavailabilities" element={<MuseumAvailability uniqueId={uniqueId} />} />
             
             
         <Route path="/museum-login" element={<LoginMuseum uniqueId={uniqueId} setUniqueId={setUniqueId} />} />
