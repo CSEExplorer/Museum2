@@ -213,7 +213,7 @@ import os
 
 # Add a DOMAIN setting that will change based on the environment
 if os.getenv('DJANGO_ENV') == 'production':
-    DOMAIN = 'museum-frontend.onrender.com'
+    DOMAIN = 'museum-fornt.onrender.com'
     print('DOMAIN')
 else:
     DOMAIN = 'localhost:3000'
