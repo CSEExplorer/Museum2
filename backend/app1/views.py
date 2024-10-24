@@ -540,8 +540,11 @@ def password_reset_request(request):
                 token = default_token_generator.make_token(user)
 
                 # Construct password reset URL
-                
-                reset_url = f"http://{settings.DOMAIN}/reset-password/{uid}/{token}/"
+                if settings.DOMAIN=='localhost:3000':
+                    protocol='http'
+                else :
+                    protocol='https'
+                reset_url = f"{protocol}://{settings.DOMAIN}/reset-password/{uid}/{token}/"
                 # Send the password reset email
                 subject = _("Password Reset Request")
                 message = render_to_string('password_reset_email.html', {

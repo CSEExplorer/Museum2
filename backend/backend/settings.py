@@ -65,7 +65,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'backend.urls'
 
-CORS_ALLOW_ALL_ORIGIN=False
+
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
