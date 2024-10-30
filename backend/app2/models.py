@@ -42,7 +42,7 @@ class Museum(models.Model):
     
 
 #--------------------------------------------Availablity Model--------------------------------------------------------------
-
+1
 from datetime import datetime, time, timedelta
 from django.db import models
 

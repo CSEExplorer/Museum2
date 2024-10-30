@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 
 // Importing images directly
-import advert1 from './advert1.jpg';
-import adverti2 from './adverti2.jpg';
-import advert4 from './advert4.jpg';
+import advert1 from '../../Media/User/advert1.jpg'; // Adjust the path as necessary based on your directory structure
+
+import adverti2 from "../../Media/User/adverti2.jpg";
+import advert4 from '../../Media/User/advert4.jpg';
 
 const Advertisement = () => {
   const images = [advert1, adverti2, advert4]; // Using the imported images

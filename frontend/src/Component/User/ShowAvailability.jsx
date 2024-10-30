@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom'; // Using for react-router-dom v6
 import 'react-calendar/dist/Calendar.css';
-import './ShowAvailability.css';
+import "../../Css/User/ShowAvailability.css";
 import axios from 'axios';
 
 const apiUrl = process.env.REACT_APP_API_URL;

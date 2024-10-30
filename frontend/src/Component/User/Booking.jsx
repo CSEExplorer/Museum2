@@ -17,7 +17,7 @@ const Booking = ({museumDetails}) => {
   const [email, setEmail] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const farePerShift =museumDetails.fare;
+  const farePerShift = museumDetails.fare;
   const totalFare =  selectedShifts.length * farePerShift;
  
 

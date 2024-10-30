@@ -183,3 +183,44 @@ def create_availability_with_shifts(request):
         'availability': AvailabilitySerializer(availability).data,
         'shifts': ShiftSerializer(Shift.objects.filter(availability=availability), many=True).data
     }, status=status.HTTP_201_CREATED)
+
+
+# ----------------------------fetching availblity based on month and museumid----------------------------------------------------
+# views.py
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import Availability, Museum
+from datetime import datetime
+from app2.serializers import AvailabilitySerializer
+import json
+
+@csrf_exempt
+@api_view(['GET'])
+def fetch_availability(request):
+    month = request.GET.get('month')
+    uniqueId = request.GET.get('id')
+    if not month:
+        return JsonResponse({"error": "Month is required"}, status=400)
+
+    try:
+        # Convert month to an integer and format it as needed
+        month = int(month)
+        if month < 1 or month > 12:
+            raise ValueError("Month should be between 1 and 12")
+    except ValueError:
+        return JsonResponse({"error": "Invalid month format"}, status=400)
+
+    # Filter availabilities by museum and month
+    availabilities = (
+        Availability.objects.filter(
+            museum__unique_id=uniqueId,
+            date__month=month
+        )
+        .prefetch_related('shifts'))
+    serializer = AvailabilitySerializer(availabilities, many=True)
+    return Response(serializer.data)
+
+    

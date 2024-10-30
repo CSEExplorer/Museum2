@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-import museum1 from './museum1.jpg'; // Adjust path as needed
-import museum2 from './museum2.jpg'; // Adjust path as needed
-import museum3 from './museum3.jpg'; // Adjust path as needed
+import museum1 from '../../Media/User/museum1.jpg'; 
+
+// the first ../ means out of the Use
+// the second one measn out of component mean in src 
+import museum2 from '../../Media/User/museum2.jpg'; // Adjust path based on actual location
+import museum3 from '../../Media/User/museum3.jpg'; // Adjust path based on actual location
+
 
 const Cart = () => {
   const images = [museum1, museum2, museum3];

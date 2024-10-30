@@ -5,8 +5,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios'; // Import axios
 
 const apiUrl = process.env.REACT_APP_API_URL;
-const MuseumAvailability = ({ uniqueId }) => {
-
+const MuseumAvailability = () => {
+    const uniqueId = localStorage.getItem("uniqueId");
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [shift, setShift] = useState('Morning');
     const [tickets, setTickets] = useState('');

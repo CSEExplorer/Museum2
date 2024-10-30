@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Card, Button, Form, Row, Col, Modal } from 'react-bootstrap';
-
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { Card, Button, Form, Row, Col, Modal } from "react-bootstrap";
+import "../../Css/Museum/UpdateAvailability.css";
 const apiUrl = process.env.REACT_APP_API_URL;
 
-const Availability = ({ uniqueId }) => {
-  const [month, setMonth] = useState('');
+const Availability = () => {
+  const uniqueId = localStorage.getItem("uniqueId");
+  const [month, setMonth] = useState("");
   const [availabilityData, setAvailabilityData] = useState([]);
   const [selectedChanges, setSelectedChanges] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -22,7 +23,7 @@ const Availability = ({ uniqueId }) => {
   const fetchAvailability = async (month) => {
     try {
       const response = await axios.get(`${apiUrl}/museums/giveavailablity/`, {
-        params: { month: month, id: uniqueId }
+        params: { month: month, id: uniqueId },
       });
       setAvailabilityData(response.data);
 
@@ -37,28 +38,45 @@ const Availability = ({ uniqueId }) => {
       console.error("Error fetching availability data:", error);
     }
   };
+  // i have made the key of date-shift_type
 
   const handleUpdate = (date, shift_type) => {
-    const currentAvailable = updatedTickets[`${date}-${shift_type}`] !== undefined
-      ? updatedTickets[`${date}-${shift_type}`]
-      : initialTickets[`${date}-${shift_type}`];
+    const currentAvailable =
+      updatedTickets[`${date}-${shift_type}`] !== undefined
+        ? updatedTickets[`${date}-${shift_type}`]
+        : initialTickets[`${date}-${shift_type}`];
 
-    setSelectedChanges(prevChanges => {
-      const existingChangeIndex = prevChanges.findIndex(change =>
-        change.date === date && change.shift_type === shift_type
+    setSelectedChanges((prevChanges) => {
+      const existingChangeIndex = prevChanges.findIndex(
+        (change) => change.date === date && change.shift_type === shift_type
       );
 
       if (existingChangeIndex >= 0) {
-        const updatedChanges = [...prevChanges];
-        updatedChanges[existingChangeIndex] = {
-          ...updatedChanges[existingChangeIndex],
-          ticketsAvailable: currentAvailable,
-        };
+        let updatedChanges = [];
+
+        for (let i = 0; i < prevChanges.length; i++) {
+          const change = prevChanges[i];
+
+          // Check if current item is the one to update
+          if (i === existingChangeIndex) {
+            updatedChanges.push({
+              ...change, // Spread existing properties of the found item
+              ticketsAvailable: currentAvailable, // Update the `ticketsAvailable` property
+            });
+          } else {
+            updatedChanges.push(change); // Add unchanged items
+          }
+        }
         return updatedChanges;
       } else {
         return [
           ...prevChanges,
-          { action: "update", date, shift_type, ticketsAvailable: currentAvailable }
+          {
+            action: "update",
+            date,
+            shift_type,
+            ticketsAvailable: currentAvailable,
+          },
         ];
       }
     });
@@ -75,38 +93,45 @@ const Availability = ({ uniqueId }) => {
   };
 
   const handleTicketChange = (date, shift_type, value) => {
-    setUpdatedTickets(prev => ({
+    setUpdatedTickets((prev) => ({
       ...prev,
-      [`${date}-${shift_type}`]: value
+      [`${date}-${shift_type}`]: value,
     }));
   };
 
   const toggleEditMode = (date, shift_type) => {
-    setEditMode(prev => ({
+    setEditMode((prev) => ({
       ...prev,
-      [`${date}-${shift_type}`]: !prev[`${date}-${shift_type}`]
+      [`${date}-${shift_type}`]: !prev[`${date}-${shift_type}`],
     }));
   };
 
   const renderUpdateField = (date, shift_type) => {
-    const currentTicketsAvailable = updatedTickets[`${date}-${shift_type}`] !== undefined
-      ? updatedTickets[`${date}-${shift_type}`]
-      : initialTickets[`${date}-${shift_type}`];
+    const currentTicketsAvailable =
+      updatedTickets[`${date}-${shift_type}`] !== undefined
+        ? updatedTickets[`${date}-${shift_type}`]
+        : initialTickets[`${date}-${shift_type}`];
 
     return (
       <div>
-        <Card.Text>Initial Tickets Available: <strong>{initialTickets[`${date}-${shift_type}`] || 'N/A'}</strong></Card.Text>
-        <Card.Text>Current Tickets Available: <strong>{currentTicketsAvailable}</strong></Card.Text>
-        {editMode[`${date}-${shift_type}`] ? (
+        <Card.Text>
+          Initial Tickets Available:{" "}
+          <strong>{initialTickets[`${date}-${shift_type}`] || "N/A"}</strong>
+        </Card.Text>
+       {editMode[`${date}-${shift_type}`] ? (
           <Form.Control
             type="number"
             value={currentTicketsAvailable}
-            onChange={(e) => handleTicketChange(date, shift_type, e.target.value)}
+            onChange={(e) =>
+              handleTicketChange(date, shift_type, e.target.value)
+            }
             placeholder="Update Tickets Available"
             className="mb-2"
           />
         ) : (
-          <span className="text-muted">{currentTicketsAvailable}</span>
+          <Card.Text className="text-muted">
+            Current Available: <strong>{currentTicketsAvailable}</strong>
+          </Card.Text>
         )}
       </div>
     );
@@ -114,7 +139,9 @@ const Availability = ({ uniqueId }) => {
 
   return (
     <div className="container mt-4">
-      <h2 className="text-center mb-4 text-primary">Manage Ticket Availability</h2>
+      <h2 className="text-center mb-4 text-primary">
+        Update Ticket Availability
+      </h2>
       <Form.Group controlId="monthSelect">
         <Form.Label>Select Month</Form.Label>
         <Form.Control
@@ -125,8 +152,8 @@ const Availability = ({ uniqueId }) => {
         >
           <option value="">Select Month</option>
           {Array.from({ length: 12 }, (_, index) => (
-            <option key={index + 1} value={String(index + 1).padStart(2, '0')}>
-              {new Date(0, index).toLocaleString('default', { month: 'long' })}
+            <option key={index + 1} value={String(index + 1).padStart(2, "0")}>
+              {new Date(0, index).toLocaleString("default", { month: "long" })}
             </option>
           ))}
         </Form.Control>
@@ -134,16 +161,24 @@ const Availability = ({ uniqueId }) => {
 
       <Row>
         {availabilityData.map(({ date, shifts }) => (
-          <Col md={4} key={date} className="mb-3">
+          <Col md={12} key={date} className="mb-3">
             <Card className="shadow-sm rounded">
               <Card.Body>
-                <Card.Title className="text-info">{new Date(date).toDateString()}</Card.Title>
+                <Card.Title className="text-info">
+                  {new Date(date).toDateString()}
+                </Card.Title>
                 {shifts.map(({ shift_type, tickets_available, id }) => (
                   <div key={`${date}-${shift_type}`} className="mb-3">
-                    <Card.Text>Shift: <strong>{shift_type}</strong></Card.Text>
+                    <Card.Text>
+                      Shift: <strong>{shift_type}</strong>
+                    </Card.Text>
                     {renderUpdateField(date, shift_type)}
                     <Button
-                      variant={editMode[`${date}-${shift_type}`] ? 'success' : 'primary'}
+                      variant={
+                        editMode[`${date}-${shift_type}`]
+                          ? "success"
+                          : "primary"
+                      }
                       onClick={() => {
                         if (editMode[`${date}-${shift_type}`]) {
                           handleUpdate(date, shift_type); // Call update if in edit mode
@@ -151,7 +186,7 @@ const Availability = ({ uniqueId }) => {
                         toggleEditMode(date, shift_type); // Toggle edit mode
                       }}
                     >
-                      {editMode[`${date}-${shift_type}`] ? 'Save' : 'Edit'}
+                      {editMode[`${date}-${shift_type}`] ? "Save" : "Edit"}
                     </Button>
                   </div>
                 ))}
@@ -174,14 +209,19 @@ const Availability = ({ uniqueId }) => {
           <ul>
             {selectedChanges.map((change, index) => (
               <li key={index}>
-                Update - {change.date}, Shift: {change.shift_type}, New Tickets Available: {change.ticketsAvailable}
+                Update - {change.date}, Shift: {change.shift_type}, New Tickets
+                Available: {change.ticketsAvailable}
               </li>
             ))}
           </ul>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>Cancel</Button>
-          <Button variant="primary" onClick={handleConfirm}>Confirm</Button>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={handleConfirm}>
+            Confirm
+          </Button>
         </Modal.Footer>
       </Modal>
     </div>
