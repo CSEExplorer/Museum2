@@ -19,8 +19,9 @@ import ForgetPassword from "./Component/User/ForgetPassword";
 import ResetPassword from "./Component/User/ResetPassword";
 // import AddAvailability from "../Component/Museum/AddAvailabilities";
 import Tickets from "./Component/User/Tickets";
+import SearchBar from "./Component/User/Searchbar";
 
-const UserRoutes = ({ setMuseumDetails, setProfile }) => {
+const UserRoutes = ({ setMuseumDetails, setProfile, museumDetails}) => {
   return (
     <Routes>
       {/* Public Routes */}
@@ -36,13 +37,10 @@ const UserRoutes = ({ setMuseumDetails, setProfile }) => {
       />
       <Route path="/information" element={<Information />} />
       <Route path="/login" element={<Login />} />
-      <Route
-        path="/places"
-        element={<Places setMuseumDetails={setMuseumDetails} />}
-      />
+      <Route path="/places" element={<Places setMuseumDetails={setMuseumDetails} />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/help" element={<Help />} />
-      <Route path="/booking/:museumId" element={<Booking />} />
+      <Route path="/booking/:museumId" element={<Booking museumDetails={museumDetails} />} />
       <Route path="/history" element={<History />} />
       <Route
         path="/profile"
@@ -54,6 +52,7 @@ const UserRoutes = ({ setMuseumDetails, setProfile }) => {
       <Route path="/availability/:museumId" element={<ShowAvailability />} />
       <Route path="/reset-password/:uid/:token" element={<ResetPassword />} />
       <Route path="/forget-password" element={<ForgetPassword />} />
+      <Route path="/searchbar" element={<SearchBar />} />
     </Routes>
   );
 };

@@ -42,18 +42,14 @@ function App() {
           <Route path="/museum-signup" element={<SignupMuseum />} />
 
           {role === "admin" ? (
-            <Route
-              path="/*"
-              element={
-                <MuseumRoutes uniqueId={uniqueId}  />
-              }
-            />
+            <Route path="/*" element={<MuseumRoutes uniqueId={uniqueId} />} />
           ) : (
             <Route
               path="/*"
               element={
                 <UserRoutes
                   setMuseumDetails={setMuseumDetails}
+                  museumDetails={museumDetails}
                   setProfile={setProfile}
                 />
               }

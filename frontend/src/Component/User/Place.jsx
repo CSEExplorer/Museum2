@@ -1,21 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate ,useLocation} from 'react-router-dom';
 import { Modal, Button } from 'react-bootstrap';
 
 const apiUrl = process.env.REACT_APP_API_URL;
 const mediaUrl = process.env.REACT_APP_MEDIA_URL;
 const Places = ( {setMuseumDetails} ) => {
-  const [museums, setMuseums] = useState([]);
-
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  // = useSearchParams();  this is used to get the url paramters of the current url 
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [city, setCity] = useState(searchParams.get('city') || '');
-  const navigate = useNavigate();
+const [museums, setMuseums] = useState([]);
+const [loading, setLoading] = useState(false);
+const [error, setError] = useState(null);
+// const [searchParams, setSearchParams] = useSearchParams();
+// const [city, setCity] = useState(searchParams.get('city') || '');
+const navigate = useNavigate();
+const location = useLocation();
+const searchParams = new URLSearchParams(location.search);
+const city = searchParams.get("city");
 
   useEffect(() => {
+    
     const fetchMuseums = async () => {
       if (!city) return;
       setLoading(true);
@@ -35,12 +37,9 @@ const Places = ( {setMuseumDetails} ) => {
     };
 
     fetchMuseums();
-  }, [city]);
+  }, [location]);
 
-  const handleSearch = (event) => {
-    setCity(event.target.value);
-    setSearchParams({ city: event.target.value });
-  };
+
  
  const handleBookTicket = (museum) => {
   console.log('Selected Museum:', museum);
@@ -57,13 +56,13 @@ const Places = ( {setMuseumDetails} ) => {
     <div className="container">
       <h1 className="mt-4">Museums in {city || '..'}</h1>
 
-      <input
+      {/* <input
         type="text"
         placeholder="Search for a city"
         value={city}
         onChange={handleSearch}
         className="form-control mb-4"
-      />
+      /> */}
 
       {loading && <p>Loading museums...</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}

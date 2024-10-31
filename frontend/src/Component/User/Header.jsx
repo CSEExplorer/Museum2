@@ -4,7 +4,7 @@ import { FaUserCircle } from "react-icons/fa";
 import Logo from "../../Media/User/Logo.jpg";
 import axios from "axios";
 const apiUrl = process.env.REACT_APP_API_URL;
-
+import SearchBar from "./Searchbar";
 
 const Header = () => {
   const [profile, setProfile] = useState(
@@ -173,7 +173,7 @@ const Header = () => {
             </li>
           </ul>
 
-          <form
+          {/* <form
             className="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3"
             role="search"
             onSubmit={handleSearchSubmit}
@@ -186,7 +186,8 @@ const Header = () => {
               value={searchQuery}
               onChange={handleSearchChange}
             />
-          </form>
+          </form> */}
+          <SearchBar />
 
           <div className="text-end d-flex align-items-center">
             {/* Login Dropdown */}

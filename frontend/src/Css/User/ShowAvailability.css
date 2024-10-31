@@ -21,7 +21,6 @@
   /* padding: 15px;; Yellow for available days */
 }
 
-
 .calendar-day:hover {
   transform: scale(1.05);
 }
