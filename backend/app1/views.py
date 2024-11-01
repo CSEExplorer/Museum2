@@ -144,7 +144,7 @@ def get_user_profile(request):
         return Response(serializer.errors, status=400)
     
 
-#-----------------------------------------Login With Email OTP--------------------------------------------------------------
+#-----------------------------------------Login With only username and password--------------------------------------------------------------
 
 from django.contrib.auth import authenticate, login
 from django.http import JsonResponse
@@ -162,7 +162,7 @@ def generate_otp():
     return ''.join(random.choices(string.digits, k=6))
 
 @csrf_exempt
-def login_view_emailotp(request):
+def login_view_simple(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
@@ -174,24 +174,18 @@ def login_view_emailotp(request):
             
             user = User.objects.get(email=email)
             user = authenticate(request, username=user.username, password=password)
-            
             if user is not None:
-                # Generate OTP and send it to user's email
-                otp = generate_otp()
-                VerificationCode.objects.update_or_create(user=user, defaults={'code': otp, 'created_at': timezone.now()})
+                # Log the user in
+                login(request, user)
                 
-                send_mail(
-                    'Your OTP Code',
-                    f'Your OTP code is {otp}',
-                    'yourapp@example.com',
-                    [email],
-                    fail_silently=False,
-                )
-                
-                # Response indicating OTP is sent
-                return JsonResponse({'message': 'OTP sent to your email.'}, status=200)
+                # Generate or retrieve the auth token for the user
+                token, created = Token.objects.get_or_create(user=user)
+
+                # Response indicating successful login
+                return JsonResponse({'message': 'Login successful', 'token': token.key}, status=200)
             else:
                 return JsonResponse({'error': 'Invalid credentials'}, status=400)
+           
         except json.JSONDecodeError:
             return JsonResponse({'error': 'Invalid JSON data'}, status=400)
         except Exception as e:
@@ -199,7 +193,52 @@ def login_view_emailotp(request):
             return JsonResponse({'error': 'Something went wrong. Please try again.'}, status=500)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
+    
+# ------------------------------login with otp  only --------------------------------------------------------------------------------
 
+from django.utils import timezone
+from django.contrib.auth.models import User
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.decorators import api_view
+from .models import VerificationCode
+from django.core.mail import send_mail
+@csrf_exempt
+@api_view(['POST'])
+def send_otp(request):
+    # Step 1: Get email from the request body
+    email = request.data.get('email')
+    if not email:
+        return Response({"error": "Email is required"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Check if user exists with this email
+    try:
+        user = User.objects.get(email=email)
+    except User.DoesNotExist:
+        return Response({"error": "User with this email does not exist"}, status=status.HTTP_404_NOT_FOUND)
+    
+    # Step 2: Generate OTP
+    otp = generate_otp()
+
+    send_mail(
+                    'Your OTP Code',
+                    f'Your OTP code is {otp}',
+                    'yourapp@example.com',
+                    [email],
+                    fail_silently=False,
+                )
+    
+    # Step 4: Save or update OTP in VerificationCode table
+    VerificationCode.objects.update_or_create(
+        user=user,
+        defaults={'code': otp, 'created_at': timezone.now()}
+    )
+    
+    return Response({"message": "OTP sent successfully","sucess":True}, status=status.HTTP_200_OK)
+
+        
+
+# ------------------------------------------verify otp-------------------------------------------------------------------------
 @csrf_exempt
 def verify_otp(request):
     if request.method == 'POST':
