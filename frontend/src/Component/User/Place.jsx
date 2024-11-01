@@ -6,6 +6,7 @@ import { Modal, Button } from 'react-bootstrap';
 const apiUrl = process.env.REACT_APP_API_URL;
 const mediaUrl = process.env.REACT_APP_MEDIA_URL;
 const Places = ( {setMuseumDetails} ) => {
+
 const [museums, setMuseums] = useState([]);
 const [loading, setLoading] = useState(false);
 const [error, setError] = useState(null);
@@ -25,8 +26,10 @@ const city = searchParams.get("city");
 
       try {
         const response = await axios.get(`${apiUrl}/museums/city/?city=${city}`);
+        console.log('this->',response.data);
         
         setMuseums(response.data);
+
 
         
       } catch (err) {
@@ -56,13 +59,7 @@ const city = searchParams.get("city");
     <div className="container">
       <h1 className="mt-4">Museums in {city || '..'}</h1>
 
-      {/* <input
-        type="text"
-        placeholder="Search for a city"
-        value={city}
-        onChange={handleSearch}
-        className="form-control mb-4"
-      /> */}
+
 
       {loading && <p>Loading museums...</p>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
@@ -76,7 +73,8 @@ const city = searchParams.get("city");
           <div key={museum.id} className="col-md-4 mb-4">
             <div className="card">
               <img
-                src={`${mediaUrl}/${museum.image}`}
+                // console.log(museum.image)
+                src={`${mediaUrl}${museum.image}`}
                 className="card-img-top"
                 alt={museum.name}
                 style={{ height: '200px', objectFit: 'cover' }}
