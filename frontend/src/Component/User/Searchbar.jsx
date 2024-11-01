@@ -7,6 +7,10 @@ const SearchBar = () => {
   const navigate = useNavigate(); 
 
   useEffect(() => {
+    if (!window.google) {
+      console.error("Google API failed to load");
+      return;
+    }
     const autocomplete = new window.google.maps.places.Autocomplete(
       inputRef.current,
       {
