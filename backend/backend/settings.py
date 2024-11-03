@@ -29,7 +29,7 @@ ALLOWED_HOSTS = [
     'localhost',  # Allow localhost for local development
     '127.0.0.1',  # Allow localhost IP
     'museum-rr68.onrender.com',
-    'c49b-2409-40d2-12bc-b417-9d15-abb1-2bfa-6c09.ngrok-free.app'  # Add your Render domain
+    '74f3-2409-4085-831d-4bd5-7548-d289-33dd-a177.ngrok-free.app'  # Add your Render domain
 ]
 
 
@@ -86,7 +86,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://museum-rr68.onrender.com",
     "http://museum-rr68.onrender.com",
-    "https://c49b-2409-40d2-12bc-b417-9d15-abb1-2bfa-6c09.ngrok-free.app"
+    "https://74f3-2409-4085-831d-4bd5-7548-d289-33dd-a177.ngrok-free.app"
         # If HTTP access is possible
 ]
 
@@ -99,7 +99,7 @@ CSRF_COOKIE_NAME = 'csrftoken'  # Default
 # settings.py
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
-    'https://c49b-2409-40d2-12bc-b417-9d15-abb1-2bfa-6c09.ngrok-free.app'
+    'https://74f3-2409-4085-831d-4bd5-7548-d289-33dd-a177.ngrok-free.app'
 
                         
     ]
