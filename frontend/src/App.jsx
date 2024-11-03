@@ -1,7 +1,7 @@
 import React, { useState ,useEffect} from "react";
 import { BrowserRouter as Router, Route, Routes  } from "react-router-dom";
 import Footer from "./Component/User/Footer";
-import Chatboard from "./Component/User/Chatboard";
+// import Chatboard from "./Component/User/Chatboard";
 import { MuseumProvider } from "./contexts/MuseumContext";
 import UserRoutes from "./UserRoutes";
 import MuseumRoutes from "./MuseumRoutes";
