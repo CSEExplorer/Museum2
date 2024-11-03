@@ -1,4 +1,3 @@
-
 .calendar-day {
   border: 1px solid #ccc;
   border-radius: 8px;
@@ -82,23 +81,22 @@
 /* Responsive design */
 @media (max-width: 768px) {
   .calendar-day {
-      width: 100%; /* Full width on smaller screens */
-      height: auto; /* Adjust height for flexibility */
+    width: 100%; /* Full width on smaller screens */
+    height: auto; /* Adjust height for flexibility */
   }
 
   .shift-card {
-      height: 40px; /* Adjust height of inner cards on small screens */
-      font-size: 11px; /* Adjust font size for smaller screens */
+    height: 40px; /* Adjust height of inner cards on small screens */
+    font-size: 11px; /* Adjust font size for smaller screens */
   }
 
   .day-number {
-      font-size: 24px; /* Responsive font size */
+    font-size: 24px; /* Responsive font size */
   }
 
   .day-name {
-      font-size: 16px; /* Responsive font size */
+    font-size: 16px; /* Responsive font size */
   }
-
 }
 
 .shift-card.selected {
@@ -106,5 +104,3 @@
   border: 2px solid #f50057; /* Optional: Add a border to distinguish the selected shift */
   color: white; /* Optional: Change text color for contrast */ /* Text color when selected */
 }
-
-

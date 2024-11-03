@@ -1,9 +1,12 @@
-import React, { useState } from "react";
+import React, { useState,useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 const apiUrl = process.env.REACT_APP_API_URL;
 import "bootstrap/dist/css/bootstrap.min.css";
+import { AuthContext } from "../../contexts/AuthContext";
+
 const LoginWithOTP = () => { 
+   const { login } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [otp, setOTP] = useState("");
   const [otpSent, setOTPSent] = useState(false);
@@ -35,7 +38,8 @@ const LoginWithOTP = () => {
         email: email, // Send email along with OTP for verification
       });
       console.log("OTP verification successful:", response.data);
-      localStorage.setItem("token", response.data.token);
+      // localStorage.setItem("token", response.data.token);
+      login(response.data.token);
 
       navigate("/"); // Navigate to home after successful login
     } catch (error) {

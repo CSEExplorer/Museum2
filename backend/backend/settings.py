@@ -28,7 +28,8 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'localhost',  # Allow localhost for local development
     '127.0.0.1',  # Allow localhost IP
-    'museum-rr68.onrender.com',  # Add your Render domain
+    'museum-rr68.onrender.com',
+    'c49b-2409-40d2-12bc-b417-9d15-abb1-2bfa-6c09.ngrok-free.app'  # Add your Render domain
 ]
 
 
@@ -49,15 +50,26 @@ INSTALLED_APPS = [
     'app2.apps.App2Config',
 ]
 
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+}
+
+
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
-     'django.middleware.csrf.CsrfViewMiddleware',
+     
     'django.middleware.security.SecurityMiddleware',
     
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -66,20 +78,31 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'backend.urls'
 
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_ALL_ORIGINS = True
+
 
 
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://museum-rr68.onrender.com",
-    "http://museum-rr68.onrender.com",  # If HTTP access is possible
+    "http://museum-rr68.onrender.com",
+    "https://c49b-2409-40d2-12bc-b417-9d15-abb1-2bfa-6c09.ngrok-free.app"
+        # If HTTP access is possible
 ]
 
-CORS_ALLOW_CREDENTIALS = True
+CSRF_USE_SESSIONS = False  # Default is False
+CSRF_COOKIE_SAMESITE = 'Lax'  # Can also be 'None' or 'Strict'
+CSRF_COOKIE_HTTPONLY = True  # Prevents JavaScript access to the cookie
+CSRF_COOKIE_NAME = 'csrftoken'  # Default
+
 
 # settings.py
-CSRF_TRUSTED_ORIGINS = ['http://localhost:3000']
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:3000',
+    'https://c49b-2409-40d2-12bc-b417-9d15-abb1-2bfa-6c09.ngrok-free.app'
+
+                        
+    ]
 
 
 
@@ -206,6 +229,13 @@ if is_render:
 else:
     # Use the local path for development
     GOOGLE_APPLICATION_CREDENTIALS = os.path.join(BASE_DIR, 'service_account_keys', 'service-account-file.json')
+
+
+
+os.environ['GOOGLE_APPLICATION_CREDENTIALS_DIALOGFLOW'] = os.path.join(BASE_DIR, 'service_account_keys', 'dialogflow-service-account.json')
+
+
+
 
 
 

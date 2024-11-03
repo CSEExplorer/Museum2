@@ -1,12 +1,14 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef,useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";
 import Logo from "../../Media/User/Logo.jpg";
 import axios from "axios";
 const apiUrl = process.env.REACT_APP_API_URL;
 import SearchBar from "./Searchbar";
+import { AuthContext } from "../../contexts/AuthContext";
 
 const Header = () => {
+  const { logout ,isAuthenticated} = useContext(AuthContext);
   const [profile, setProfile] = useState(
     localStorage.getItem("profile_image_url")
   );
@@ -21,19 +23,6 @@ const Header = () => {
 
  
 
-  // // Update profile URL when it changes in localStorage
-  // useEffect(() => {
-  //   const handleStorageChange = () => {
-  //     const updatedProfile = localStorage.getItem("profile_image_url");
-  //     setProfile(updatedProfile);
-  //   };
-
-  //   // Listen for changes in localStorage (e.g., when user logs out)
-  //   window.addEventListener("storage", handleStorageChange);
-
-  //   // Cleanup listener on component unmount
-  //   return () => window.removeEventListener("storage", handleStorageChange);
-  // }, []);
 
   useEffect(() => {
     // Close dropdowns if clicked outside of them
@@ -108,16 +97,7 @@ const Header = () => {
           Authorization: `Token ${token}`, // Get token from local storage
         },
       });
-
-      // Remove the token from local storage
-      localStorage.removeItem("token");
-      localStorage.removeItem("profile_image_url");
-      setProfile(null);
-
-
-      // Reload the page to reflect the changes in the header
-      window.location.reload();
-      // Redirect to login page
+      logout();
       navigate("/login");
     } catch (error) {
       // Log detailed error
@@ -173,20 +153,6 @@ const Header = () => {
             </li>
           </ul>
 
-          {/* <form
-            className="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3"
-            role="search"
-            onSubmit={handleSearchSubmit}
-          >
-            <input
-              type="search"
-              className="form-control form-control-dark text-bg-light"
-              placeholder="Search City"
-              aria-label="Search"
-              value={searchQuery}
-              onChange={handleSearchChange}
-            />
-          </form> */}
           <SearchBar />
 
           <div className="text-end d-flex align-items-center">
@@ -253,7 +219,7 @@ const Header = () => {
                   height: "40px",
                 }} // Ensures circular container
               >
-                {profile ? (
+                { isAuthenticated ? (
                   <img
                     src={profile}
                     alt="Profile"

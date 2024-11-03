@@ -22,7 +22,7 @@ const ProfileAccount = ({ setProfile}) => {
     const [imagePreview, setImagePreview] = useState('');
     const localProfileImage = localStorage.getItem('profile_image_url');
     console.log('Image from local storage:', localProfileImage);
-
+    
 
     
   

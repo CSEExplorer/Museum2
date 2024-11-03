@@ -28,7 +28,7 @@ const ShowAvailability = () => {
             try {
                 const response = await axios.get(`${apiUrl}/museums/${museumId}/availabilities/${currentMonth+1}/`);
                 setAvailability(response.data);
-                // console.log(response.data);
+                console.log(response.data);
                 setLoading(false);
             } catch (error) {
                 console.error('Error fetching availability:', error);
@@ -107,40 +107,53 @@ const ShowAvailability = () => {
             const eveningShift = dayAvailability?.shifts.find(shift => shift.shift_type === 'Evening');
             // const isExpanded = expandedDay === dateString;
             return (
-                <div
-                    key={day}
-                    className={`calendar-day ${dayClass}`} // Main card for day and date
-                    // onClick={() => handleDayClick(dayAvailability)}
-
-                >
-                    <div className="day-header">
-                        <div className="day-number">{day}</div>
-                        <div className="day-name">{new Date(dateString).toLocaleString('default', { weekday: 'long' })}</div>
-                    </div>
-                   
-                   {dayAvailability && !dayAvailability.is_closed && (
-    <div className="shifts-container">
-        <div 
-            className={`shift-card morning-card ${selectedShifts.includes(`Morning-${dateString}`) ? 'selected' : ''}`}
-            onClick={() => handleShiftClick('Morning', dateString)}
-        >
-            <div className="shift-title">M</div>
-            <div className="available-tickets">
-                {morningShift ? morningShift.tickets_available : 0} 
-            </div>
-        </div>
-        <div 
-           className={`shift-card evening-card ${selectedShifts.includes(`Evening-${dateString}`) ? 'selected' : ''}`}
-            onClick={() => handleShiftClick('Evening', dateString)}
-        >
-            <div className="shift-title">E</div>
-            <div className="available-tickets">
-                {eveningShift ? eveningShift.tickets_available : 0}
-            </div>
-        </div>
-    </div>
-)}
+              <div
+                key={day}
+                className={`calendar-day ${dayClass}`} // Main card for day and date
+                // onClick={() => handleDayClick(dayAvailability)}
+              >
+                <div className="day-header">
+                  <div className="day-number">{day+1}</div>
+                  <div className="day-name">
+                    {new Date(dateString).toLocaleString("default", {
+                      weekday: "long",
+                    })}
+                  </div>
                 </div>
+
+                {dayAvailability && !dayAvailability.is_closed && (
+                  <div className="shifts-container">
+                    <div
+                      className={`shift-card morning-card ${
+                        selectedShifts.includes(`Morning-${dateString}`)
+                          ? "selected"
+                          : ""
+                      }`}
+                      onClick={() => handleShiftClick("Morning", dateString)}
+                    >
+                      <div className="shift-title">M</div>
+                      <div className="available-tickets">
+                        {morningShift ? morningShift.tickets_available : 0}
+                      </div>
+                      {/* <Counter /> */}
+                    </div>
+                    <div
+                      className={`shift-card evening-card ${
+                        selectedShifts.includes(`Evening-${dateString}`)
+                          ? "selected"
+                          : ""
+                      }`}
+                      onClick={() => handleShiftClick("Evening", dateString)}
+                    >
+                      <div className="shift-title">E</div>
+                      <div className="available-tickets">
+                        {eveningShift ? eveningShift.tickets_available : 0}
+                        {/* <Counter /> */}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             );
     
         });

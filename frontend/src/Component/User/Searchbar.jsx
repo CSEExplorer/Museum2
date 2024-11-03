@@ -42,6 +42,7 @@ const SearchBar = () => {
 
   const handleSearchSubmit = (event) => {
     event.preventDefault();
+    navigate(`/places?city=${searchQuery}`);
     
   };
 

@@ -645,3 +645,86 @@ def password_reset_confirm(request, uidb64, token):
         # Token is invalid or expired
         return JsonResponse({"error": "Invalid token or request."}, status=400)
 
+
+
+
+# -----------------------------------------------------dialogflow-----------------------------------------------------------
+
+
+from google.cloud import dialogflow_v2 as dialogflow
+from rest_framework.response import Response
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework import status
+from django.views.decorators.csrf import csrf_exempt
+from google.oauth2 import service_account
+from django.http import JsonResponse
+from rest_framework.permissions import IsAuthenticated
+import os
+import requests
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+@csrf_exempt
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def dialogflow_webhook(request):
+    # Extract user information
+    user = request.user  # Get the logged-in user object
+    user_name = user.username if user.is_authenticated else 'Guest'
+    user_message = request.data.get('message')
+    if not user_message:
+        return Response({"error": "Message text not provided."}, status=400)
+
+    session_id = request.data.get('sessionId')
+
+    # Load Dialogflow credentials and initialize session
+    project_id = 'flash-adapter-439018-s4'
+    try:
+        dialogflow_credentials = service_account.Credentials.from_service_account_file(
+            os.path.join(BASE_DIR, 'service_account_keys', 'dialogflow-service-account.json')
+        )
+    except Exception as e:
+        return Response({'error': f'Could not load credentials: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    session_client = dialogflow.SessionsClient(credentials=dialogflow_credentials)
+    session = session_client.session_path(project_id, session_id)
+
+    text_input = dialogflow.TextInput(text=user_message, language_code='en')
+    query_input = dialogflow.QueryInput(text=text_input)
+
+    response = session_client.detect_intent(session=session, query_input=query_input)
+    dialogflow_response_text = response.query_result.fulfillment_text
+    intent_name = response.query_result.intent.display_name
+
+    # Handle responses based on intent name
+    if intent_name == "WelcomeIntent":
+        response_message = f"Hello, {user_name}!"  
+        
+
+    elif intent_name == "ProfileIntent":
+        # Assuming `get_user_profile` is available at `/api/user/profile/`
+        profile_url = request.build_absolute_uri('/api/user/profile/')
+        token = request.auth  # or `request.META.get('HTTP_AUTHORIZATION')` if using token in header
+        headers = {'Authorization': f'Token {token}'}
+
+        try:
+            profile_response = requests.get(profile_url, headers=headers)
+            if profile_response.status_code == 200:
+                profile_data = profile_response.json()
+                profile_message = f"Here is your profile information:\n"
+                profile_message += f"Name: {profile_data.get('username', 'N/A')}\n"
+                profile_message += f"Email: {profile_data.get('email', 'N/A')}\n"
+                profile_message += f"Phone: {profile_data.get('phone_number', 'N/A')}\n"
+                profile_message += f"Address: {profile_data.get('address', 'N/A')}\n"
+                profile_message += f"City: {profile_data.get('city', 'N/A')}\n"
+                profile_message += f"State: {profile_data.get('state', 'N/A')}\n"
+                # profile_message += f"photo: {profile_data.get('profile_image', 'N/A')}\n"
+                response_message = profile_message
+            else:
+                response_message = "Unable to fetch profile information."
+        except requests.RequestException as e:
+            response_message = f"Error fetching profile information: {str(e)}"
+    else:
+        response_message = dialogflow_response_text  # Default response for other intents
+
+    return JsonResponse({'response': response_message})

@@ -3,6 +3,7 @@ import { useParams, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Button, Card, Form } from "react-bootstrap";
 
+
 const apiUrl = process.env.REACT_APP_API_URL;
 const mediaUrl = process.env.REACT_APP_MEDIA_URL;
 const razorpayKey = process.env.REACT_APP_RAZORPAY_KEY;
@@ -13,7 +14,7 @@ const Booking = ({ museumDetails }) => {
   const { museumId } = useParams();
   const navigate = useNavigate();
   const { selectedShifts } = location.state || {};
-
+  console.log(selectedShifts);
   const [email, setEmail] = useState("");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -159,10 +160,15 @@ const Booking = ({ museumDetails }) => {
                     key={index}
                     className="list-group-item d-flex justify-content-between align-items-center"
                   >
-                    {shift}
+                    {/* {shift}
                     <span className="badge bg-primary text-white">
-                      Selected
-                    </span>
+                      Selected */}
+                    <div>{shift}</div>
+                    <div className="d-flex align-items-center">
+                      {/* Include Counter for each shift */}
+                      {/* <Counter shift={shift}/> */}
+                      
+                    </div>
                   </li>
                 ))}
               </ul>

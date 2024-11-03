@@ -1,6 +1,6 @@
 import React, { useState, useContext } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate ,Link} from "react-router-dom";
 import { useRole } from "../../contexts/RoleProvider.jsx"; // Ensure this is the correct path
 const apiUrl = process.env.REACT_APP_API_URL;
 
@@ -131,6 +131,12 @@ const LoginMuseum = ({ uniqueId, setUniqueId }) => {
           />
           {errors.password && <p style={styles.error}>{errors.password}</p>}
         </div>
+        <p>
+          <Link to="/forget-password">Forgot Password?</Link>
+        </p>
+        <p>
+          <Link to="/forget-password">Forgot UniqueId?</Link>
+        </p>
         <button type="submit" style={styles.button}>
           Login
         </button>
