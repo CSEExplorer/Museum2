@@ -206,7 +206,7 @@ EMAIL_HOST_PASSWORD="wxrt cmsd uvbc azwe"
 RAZORPAY_KEY_ID = 'rzp_test_qRwrfdLBNDfLRV'
 RAZORPAY_KEY_SECRET = 'kjlZAL5kpTnQaRU1GI2YTpI5'
 
-
+# -------------------------for uploading image on cloud------------------------------------------------------------------
 
 
 import os
@@ -235,12 +235,26 @@ else:
 
 
 
-os.environ['GOOGLE_APPLICATION_CREDENTIALS_DIALOGFLOW'] = os.path.join(BASE_DIR, 'service_account_keys', 'dialogflow-service-account.json')
+
+# ------------------------------------for dialoglow-------------------------------------------------------------------------
+
+if is_render:
+    print("i am here in production in settings")
+    service_account_info = json.loads(os.environ['GOOGLE_APPLICATION_CREDENTIALS_DIALOGFLOW'])
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.json') as temp_file:
+        temp_file.write(json.dumps(service_account_info).encode())
+        GOOGLE_DIALOGFLOW_CREDENTIALS = temp_file.name
+
+else:
+    # Use the local path for development
+    GOOGLE_DIALOGFLOW_CREDENTIALS = os.path.join(BASE_DIR, 'service_account_keys', 'dialogflow-service-account.json')
+
+
+os.environ['GOOGLE_DIALOGFLOW_CREDENTIALS'] = GOOGLE_DIALOGFLOW_CREDENTIALS
 
 
 
-
-
+# -----------------------------------for chnaging domain in the view --------------------------------------------------------
 
 import os
 
@@ -251,8 +265,5 @@ if os.getenv('DJANGO_ENV') == 'production':
 else:
     DOMAIN = 'localhost:3000'
 
-    
 
-
-# Any other necessary configurations...
 

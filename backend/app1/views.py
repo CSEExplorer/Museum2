@@ -662,13 +662,11 @@ from rest_framework.permissions import IsAuthenticated
 import os
 import requests
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 @csrf_exempt
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def dialogflow_webhook(request):
-    # Extract user information
+  
     user = request.user  # Get the logged-in user object
     user_name = user.username if user.is_authenticated else 'Guest'
     user_message = request.data.get('message')
@@ -676,16 +674,15 @@ def dialogflow_webhook(request):
         return Response({"error": "Message text not provided."}, status=400)
 
     session_id = request.data.get('sessionId')
-
-    # Load Dialogflow credentials and initialize session
     project_id = 'flash-adapter-439018-s4'
     try:
         dialogflow_credentials = service_account.Credentials.from_service_account_file(
-            os.path.join(BASE_DIR, 'service_account_keys', 'dialogflow-service-account.json')
+            # os.path.join(BASE_DIR, 'service_account_keys', 'dialogflow-service-account.json') for development 
+            os.environ['GOOGLE_DIALOGFLOW_CREDENTIALS']
         )
     except Exception as e:
         return Response({'error': f'Could not load credentials: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+    print(dialogflow_credentials)
     session_client = dialogflow.SessionsClient(credentials=dialogflow_credentials)
     session = session_client.session_path(project_id, session_id)
 
