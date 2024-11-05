@@ -87,10 +87,12 @@ CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "http://localhost:8000",
     "https://museum-rr68.onrender.com",
     "http://museum-rr68.onrender.com",
-    "https://74f3-2409-4085-831d-4bd5-7548-d289-33dd-a177.ngrok-free.app"
-        # If HTTP access is possible
+    "https://74f3-2409-4085-831d-4bd5-7548-d289-33dd-a177.ngrok-free.app",
+    "https://dialogflow.cloud.google.com"
+      
 ]
 
 CSRF_USE_SESSIONS = False  # Default is False

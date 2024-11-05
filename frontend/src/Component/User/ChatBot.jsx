@@ -1,17 +1,21 @@
-import React, { useState, useEffect, useRef,useContext } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 const apiUrl = process.env.REACT_APP_API_URL;
-import chatIcon from "../../Media/User/chatIcon.png"
-import {AuthContext} from "../../contexts/AuthContext";
+import chatIcon from "../../Media/User/chatIcon.png";
+import { AuthContext } from "../../contexts/AuthContext";
+
+import WelcomeIntent from "../../ChatBot/WelcomeIntent";
+import ProfileIntent from "../../ChatBot/ProfileIntent";
+import MuseumIntent from "../../ChatBot/MuseumIntent";
+
+
 const Chatboard = () => {
   const { isAuthenticated } = useContext(AuthContext);
   const [messages, setMessages] = useState([]);
   const [userInput, setUserInput] = useState("");
-  const [isOpen, setIsOpen] = useState(true); // State to control chat visibility
+  const [isOpen, setIsOpen] = useState(true);
   const chatRef = useRef(null);
-  
-
 
   const getSessionId = () => {
     let sessionId = sessionStorage.getItem("sessionId");
@@ -26,7 +30,6 @@ const Chatboard = () => {
     try {
       const sessionId = getSessionId();
       const token = localStorage.getItem("token");
-      console.log(token);
 
       const response = await axios.post(
         `${apiUrl}/dialogflow_webhook/`,
@@ -43,54 +46,82 @@ const Chatboard = () => {
       );
 
       const data = response.data;
-      console.log(response.data);
+      console.log(data);
+      const { intent, response: botResponse } = data;
 
-      setMessages([
-        ...messages,
-        { text: userInput, sender: "user" },
-        { text: data.response, sender: "bot" },
-      ]);
 
+      switch (intent) {
+        case "WelcomeIntent":
+          // console.log("hii");
+          setMessages((prev) => [
+            ...prev,
+            { component: <WelcomeIntent userName={botResponse} />, sender: "bot" },
+          ]);
+          break;
+
+        case "ProfileIntent":
+          setMessages((prev) => [
+            ...prev,
+            {
+              component: <ProfileIntent profileData={botResponse} />,
+              sender: "bot",
+            },
+          ]);
+          break;
+
+        case "FindMuseumByCity":
+          const museumResponse = data.response;
+          setMessages((prev) => [
+            ...prev,
+            {
+              component: <MuseumIntent museums={botResponse} />,
+              sender: "bot",
+            },
+          ]);
+          break;
+
+        
+
+        default:
+          setMessages((prev) => [
+            ...prev,
+            { text: botResponse, sender: "bot" },
+          ]);
+          break;
+      }
+
+      setMessages((prev) => [...prev, { text: userInput, sender: "user" }]);
       setUserInput("");
     } catch (error) {
       console.error("Error sending message:", error);
     }
   };
 
-  // Handle clicks outside the chat container to close it
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (chatRef.current && !chatRef.current.contains(event.target)) {
-        setIsOpen(false); // Close the chat
+        setIsOpen(false);
       }
     };
 
-    // Attach event listener
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      // Cleanup the event listener
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
-
   if (!isAuthenticated) {
-    return null; // Don't render the chatbot if the user is not authenticated
+    return null;
   }
-
 
   if (!isOpen) {
     return (
       <button onClick={() => setIsOpen(true)} style={styles.openChatButton}>
-        <img
-          src={chatIcon} 
-          alt="Open Chat"
-          style={styles.chatButtonImage} // Optional: Add styles to the image
-        />
+        <img src={chatIcon} alt="Open Chat" style={styles.chatButtonImage} />
       </button>
     );
   }
- 
+
   return (
     <div ref={chatRef} style={styles.chatContainer}>
       <div style={styles.messagesContainer}>
@@ -101,7 +132,7 @@ const Chatboard = () => {
               msg.sender === "user" ? styles.userMessage : styles.botMessage
             }
           >
-            {msg.text}
+            {msg.component || msg.text}
           </div>
         ))}
       </div>
@@ -123,7 +154,7 @@ const Chatboard = () => {
 
 export default Chatboard;
 
-// Inline styles for a modern chatbot UI
+// Inline styles
 const styles = {
   chatContainer: {
     maxWidth: "400px",
@@ -199,10 +230,10 @@ const styles = {
   },
   chatButtonImage: {
     backgroundColor: "transparent",
-    width: "30px", // Set the width of the image
-    height: "30px", // Set the height of the image
-    borderRadius: "50%", // This makes the image circular
-    overflow: "hidden", // Ensures that any overflow is hidden
-    objectFit: "cover", // This keeps the aspect ratio and fills the circle
+    width: "30px",
+    height: "30px",
+    borderRadius: "50%",
+    overflow: "hidden",
+    objectFit: "cover",
   },
 };

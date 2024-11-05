@@ -658,21 +658,23 @@ from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 from google.oauth2 import service_account
 from django.http import JsonResponse
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
 import os
 import requests
 
 @csrf_exempt
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def dialogflow_webhook(request):
+    print(request.data);
   
     user = request.user  # Get the logged-in user object
     user_name = user.username if user.is_authenticated else 'Guest'
     user_message = request.data.get('message')
+    
     if not user_message:
         return Response({"error": "Message text not provided."}, status=400)
-
+    
     session_id = request.data.get('sessionId')
     project_id = 'flash-adapter-439018-s4'
     try:
@@ -682,7 +684,7 @@ def dialogflow_webhook(request):
         )
     except Exception as e:
         return Response({'error': f'Could not load credentials: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    print(dialogflow_credentials)
+    # print(dialogflow_credentials)
     session_client = dialogflow.SessionsClient(credentials=dialogflow_credentials)
     session = session_client.session_path(project_id, session_id)
 
@@ -692,36 +694,57 @@ def dialogflow_webhook(request):
     response = session_client.detect_intent(session=session, query_input=query_input)
     dialogflow_response_text = response.query_result.fulfillment_text
     intent_name = response.query_result.intent.display_name
-
-    # Handle responses based on intent name
+    print(intent_name)
+    parameters = response.query_result.parameters
     if intent_name == "WelcomeIntent":
-        response_message = f"Hello, {user_name}!"  
-        
-
+        return JsonResponse({'response': user_name,'intent':intent_name})
     elif intent_name == "ProfileIntent":
-        # Assuming `get_user_profile` is available at `/api/user/profile/`
-        profile_url = request.build_absolute_uri('/api/user/profile/')
-        token = request.auth  # or `request.META.get('HTTP_AUTHORIZATION')` if using token in header
-        headers = {'Authorization': f'Token {token}'}
+        return profile_intent(request,intent_name)
+    elif intent_name == "FindMuseumByCity":
+        return find_museum_by_city(request, parameters,intent_name)
+    else:
+        return JsonResponse({'response': dialogflow_response_text})  # Default response for other intents
+
+    
+
+
+
+
+
+
+def profile_intent(request,intent_name):
+    profile_url = request.build_absolute_uri('/api/user/profile/')
+    token = request.auth  # or `request.META.get('HTTP_AUTHORIZATION')` if using token in header
+    headers = {'Authorization': f'Token {token}'}
+
+    try:
+        profile_response = requests.get(profile_url, headers=headers)
+        if profile_response.status_code == 200:
+            return JsonResponse({'response': profile_response.json(),'intent':intent_name})
+        else:
+            return JsonResponse({'response': "Unable to fetch profile information."}, status=500)
+    except requests.RequestException as e:
+        return JsonResponse({'response': f"Error fetching profile information: {str(e)}"}, status=500)
+    
+
+
+def find_museum_by_city(request, parameters,intent_name):
+    city = parameters.get('city')
+    print(city)
+    if city:
+        museum_url = request.build_absolute_uri(f'/api/museums/city/?city={city}')
 
         try:
-            profile_response = requests.get(profile_url, headers=headers)
-            if profile_response.status_code == 200:
-                profile_data = profile_response.json()
-                profile_message = f"Here is your profile information:\n"
-                profile_message += f"Name: {profile_data.get('username', 'N/A')}\n"
-                profile_message += f"Email: {profile_data.get('email', 'N/A')}\n"
-                profile_message += f"Phone: {profile_data.get('phone_number', 'N/A')}\n"
-                profile_message += f"Address: {profile_data.get('address', 'N/A')}\n"
-                profile_message += f"City: {profile_data.get('city', 'N/A')}\n"
-                profile_message += f"State: {profile_data.get('state', 'N/A')}\n"
-                # profile_message += f"photo: {profile_data.get('profile_image', 'N/A')}\n"
-                response_message = profile_message
+            museum_response = requests.get(museum_url)
+            if museum_response.status_code == 200:
+                museums = museum_response.json()
+                if museums:
+                   return JsonResponse({'response': museums,'intent':intent_name})
+                else:
+                    return JsonResponse({'response': f"No museums found in {city}."}, status=404)
             else:
-                response_message = "Unable to fetch profile information."
+                return JsonResponse({'response': "Unable to fetch museums at this time."}, status=500)
         except requests.RequestException as e:
-            response_message = f"Error fetching profile information: {str(e)}"
+            return JsonResponse({'response': f"Error fetching museums: {str(e)}"}, status=500)
     else:
-        response_message = dialogflow_response_text  # Default response for other intents
-
-    return JsonResponse({'response': response_message})
+        return JsonResponse({'response': "Please specify a city to find museums."}, status=400)
