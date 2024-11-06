@@ -29,7 +29,7 @@ ALLOWED_HOSTS = [
     'localhost',  # Allow localhost for local development
     '127.0.0.1',  # Allow localhost IP
     'museum-rr68.onrender.com',
-    '74f3-2409-4085-831d-4bd5-7548-d289-33dd-a177.ngrok-free.app'  # Add your Render domain
+    '8bf7-2409-4050-2e3d-5b31-3468-6c7c-9f5a-386e.ngrok-free.app'  # Add your Render domain
 ]
 
 
@@ -90,7 +90,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",
     "https://museum-rr68.onrender.com",
     "http://museum-rr68.onrender.com",
-    "https://74f3-2409-4085-831d-4bd5-7548-d289-33dd-a177.ngrok-free.app",
+    "https://8bf7-2409-4050-2e3d-5b31-3468-6c7c-9f5a-386e.ngrok-free.app",
     "https://dialogflow.cloud.google.com"
       
 ]
@@ -104,7 +104,7 @@ CSRF_COOKIE_NAME = 'csrftoken'  # Default
 # settings.py
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
-    'https://74f3-2409-4085-831d-4bd5-7548-d289-33dd-a177.ngrok-free.app'
+    'https://8bf7-2409-4050-2e3d-5b31-3468-6c7c-9f5a-386e.ngrok-free.app '
 
                         
     ]

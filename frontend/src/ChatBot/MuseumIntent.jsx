@@ -1,7 +1,7 @@
 import React from "react";
 
 // MuseumIntent component
-const MuseumIntent = ({ museums }) => {
+const MuseumIntent = ({ museums,onBookClick }) => {
 console.log(museums);
   return (
     <div style={styles.museumContainer}>
@@ -16,9 +16,15 @@ console.log(museums);
               <br />
               <button
                 style={styles.exploreButton}
-                onClick={() => handleExploreClick(museum.id)} // Handle the explore action
+                onClick={() => handleExploreClick(museum.museum_id)} // Handle the explore action
               >
                 Explore
+              </button>
+              <button
+                style={styles.Book}
+                onClick={() => onBookClick(museum.name,museum.museum_id)} // Handle the explore action
+              >
+                Book Now !
               </button>
             </li>
           ))}
@@ -30,14 +36,13 @@ console.log(museums);
   );
 };
 
-// Function to handle exploring a museum
+
 const handleExploreClick = (museumId) => {
-  // Implement the logic to navigate to the museum's blog or details page
-  console.log(`Explore museum with ID: ${museumId}`);
-  // This can be replaced with a navigation function or a modal to show details
+  
+  console.log(`Explore museum with ID: ${museumId}`);// This can be replaced with a navigation function or a modal to show details
 };
 
-// Styles for the MuseumIntent component
+
 const styles = {
   museumContainer: {
     padding: "15px",
@@ -63,6 +68,15 @@ const styles = {
     backgroundColor: "#fff",
   },
   exploreButton: {
+    marginTop: "5px",
+    padding: "5px 10px",
+    backgroundColor: "#007bff",
+    color: "#fff",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer",
+  },
+  Book: {
     marginTop: "5px",
     padding: "5px 10px",
     backgroundColor: "#007bff",

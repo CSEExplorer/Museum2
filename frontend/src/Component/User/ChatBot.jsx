@@ -8,15 +8,18 @@ import { AuthContext } from "../../contexts/AuthContext";
 import WelcomeIntent from "../../ChatBot/WelcomeIntent";
 import ProfileIntent from "../../ChatBot/ProfileIntent";
 import MuseumIntent from "../../ChatBot/MuseumIntent";
-
-
+import ShowAvailability from "../../ChatBot/ShowAvailability"
+import ActionButtons from "../../ChatBot/Booking";
 const Chatboard = () => {
+  const[museumDetails,setMuseumDetails]=useState("");
+  // console.log("hii",museumDetails);
   const { isAuthenticated } = useContext(AuthContext);
   const [messages, setMessages] = useState([]);
   const [userInput, setUserInput] = useState("");
   const [isOpen, setIsOpen] = useState(true);
   const chatRef = useRef(null);
-
+   const messagesContainerRef = useRef(null);
+  const[museumId,setMuseumId]= useState(""); 
   const getSessionId = () => {
     let sessionId = sessionStorage.getItem("sessionId");
     if (!sessionId) {
@@ -26,7 +29,19 @@ const Chatboard = () => {
     return sessionId;
   };
 
+  const handleBookClick = (name,museum_id) => {
+    setMuseumId(museum_id);
+    setMessages((prev) => [
+      ...prev,
+      {
+        text:'Enter Date ->(YYYY-MM-DD)',
+        sender: "bot",
+      },
+    ]);
+  };
+
   const handleSendMessage = async () => {
+    setMessages((prev) => [...prev, { text: userInput, sender: "user" }]);
     try {
       const sessionId = getSessionId();
       const token = localStorage.getItem("token");
@@ -36,6 +51,7 @@ const Chatboard = () => {
         {
           message: userInput,
           sessionId: sessionId,
+          musuemId:museumId,
         },
         {
           headers: {
@@ -55,7 +71,10 @@ const Chatboard = () => {
           // console.log("hii");
           setMessages((prev) => [
             ...prev,
-            { component: <WelcomeIntent userName={botResponse} />, sender: "bot" },
+            {
+              component: <WelcomeIntent userName={botResponse} />,
+              sender: "bot",
+            },
           ]);
           break;
 
@@ -70,18 +89,59 @@ const Chatboard = () => {
           break;
 
         case "FindMuseumByCity":
-          const museumResponse = data.response;
+          
+          setMuseumDetails(data.response);
           setMessages((prev) => [
             ...prev,
             {
-              component: <MuseumIntent museums={botResponse} />,
+              component: (
+                <MuseumIntent
+                  museums={botResponse}
+                  onBookClick={handleBookClick}
+                />
+              ),
+              sender: "bot",
+            },
+          ]);
+          
+          break;
+        case "ShowAvailability":
+          setMessages((prev) => [
+            ...prev,
+            {
+              component: <ShowAvailability availabilityData={botResponse} />,
+
+              sender: "bot",
+            },
+            {
+              component: (
+                <ActionButtons
+                  onCancelBooking={() => {
+                    setMuseumDetails("");
+                    setMessages((prev) => [
+                      ...prev,
+                      {
+                        text: "You chose to cancel the booking.",
+                        sender: "bot",
+                      },
+                    ]);
+                  }}
+                  onBookNow={() => {
+                    setMessages((prev) => [
+                      ...prev,
+                      {
+                        text: "which Shift  and How many Tickets(Max:3)  ? [shift-ticket]",
+                        sender: "bot",
+                      },
+                    ]);
+                  }}
+                />
+              ),
               sender: "bot",
             },
           ]);
           break;
-
-        
-
+          
         default:
           setMessages((prev) => [
             ...prev,
@@ -90,7 +150,7 @@ const Chatboard = () => {
           break;
       }
 
-      setMessages((prev) => [...prev, { text: userInput, sender: "user" }]);
+      // setMessages((prev) => [...prev, { text: userInput, sender: "user" }]);
       setUserInput("");
     } catch (error) {
       console.error("Error sending message:", error);
@@ -110,6 +170,13 @@ const Chatboard = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop =
+        messagesContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
+
   if (!isAuthenticated) {
     return null;
   }
@@ -124,7 +191,7 @@ const Chatboard = () => {
 
   return (
     <div ref={chatRef} style={styles.chatContainer}>
-      <div style={styles.messagesContainer}>
+      <div style={styles.messagesContainer} ref={messagesContainerRef}>
         {messages.map((msg, index) => (
           <div
             key={index}
@@ -170,8 +237,8 @@ const styles = {
     fontFamily: "Arial, sans-serif",
   },
   messagesContainer: {
-    padding: "10px",
-    maxHeight: "300px",
+    padding: "5px",
+    maxHeight: "400px",
     overflowY: "auto",
     display: "flex",
     flexDirection: "column",
@@ -188,9 +255,9 @@ const styles = {
   },
   botMessage: {
     alignSelf: "flex-start",
-    backgroundColor: "#e5e5ea",
+    backgroundColor: "#ADD8E6",
     color: "#333",
-    padding: "8px 12px",
+    padding: "5px 5px",
     borderRadius: "15px",
     maxWidth: "70%",
     wordWrap: "break-word",

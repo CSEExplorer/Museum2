@@ -3,11 +3,10 @@ import { useParams, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Button, Card, Form } from "react-bootstrap";
 
-
 const apiUrl = process.env.REACT_APP_API_URL;
 const mediaUrl = process.env.REACT_APP_MEDIA_URL;
 const razorpayKey = process.env.REACT_APP_RAZORPAY_KEY;
-const Booking = ({ museumDetails }) => {
+const Booking = ({museumDetails,date,shift }) => {
   console.log(museumDetails);
 
   const location = useLocation();
@@ -102,7 +101,6 @@ const Booking = ({ museumDetails }) => {
         return;
       }
 
-     
       try {
         const response = await axios.post(
           `${apiUrl}/museums/${museumId}/create_order/`,
@@ -167,7 +165,6 @@ const Booking = ({ museumDetails }) => {
                     <div className="d-flex align-items-center">
                       {/* Include Counter for each shift */}
                       {/* <Counter shift={shift}/> */}
-                      
                     </div>
                   </li>
                 ))}

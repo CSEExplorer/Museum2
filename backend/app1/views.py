@@ -644,6 +644,61 @@ def password_reset_confirm(request, uidb64, token):
     else:
         # Token is invalid or expired
         return JsonResponse({"error": "Invalid token or request."}, status=400)
+# ----------------------------------------------fetching aviablity directly by date---------------------------------------------
+# views.py
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework import status
+from app2.models import Museum, Availability
+from app2.serializers import AvailabilitySerializer
+from datetime import datetime
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def check_availability_by_date(request):
+    # Get the data from the request
+    museum_id = request.data.get('museum_id')
+    booking_date = request.data.get('date')
+
+    # Validate museum_id and booking_date
+    if not museum_id or not booking_date:
+        missing_param = "museum_id" if not museum_id else "date"
+        return Response(
+            {"error": f"Missing parameter: {missing_param}."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    try:
+        # Convert date string to a date object
+        booking_date_obj = datetime.strptime(booking_date, "%Y-%m-%d").date()
+    except ValueError:
+        return Response(
+            {"error": "Invalid date format. Use YYYY-MM-DD."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # Check if the museum exists
+    try:
+        museum = Museum.objects.get(museum_id=museum_id)
+    except Museum.DoesNotExist:
+        return Response(
+            {"error": "Museum not found."},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    # Fetch availability for the specified date and museum
+    availability = Availability.objects.filter(museum=museum, date=booking_date_obj).first()
+
+    if availability:
+        serializer = AvailabilitySerializer(availability)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return Response(
+            {"message": "No availability found for the specified date."},
+            status=status.HTTP_404_NOT_FOUND
+        )
 
 
 
@@ -661,6 +716,7 @@ from django.http import JsonResponse
 from rest_framework.permissions import AllowAny
 import os
 import requests
+from datetime import datetime
 
 @csrf_exempt
 @api_view(['POST'])
@@ -694,14 +750,31 @@ def dialogflow_webhook(request):
     response = session_client.detect_intent(session=session, query_input=query_input)
     dialogflow_response_text = response.query_result.fulfillment_text
     intent_name = response.query_result.intent.display_name
-    print(intent_name)
+    # contexts = response.query_result.output_contexts
+    # print(intent_name)
     parameters = response.query_result.parameters
+    # print(parameters);
+
+
     if intent_name == "WelcomeIntent":
         return JsonResponse({'response': user_name,'intent':intent_name})
+    
+
     elif intent_name == "ProfileIntent":
         return profile_intent(request,intent_name)
+    
+
+
+
     elif intent_name == "FindMuseumByCity":
-        return find_museum_by_city(request, parameters,intent_name)
+        return  find_museum_by_city(request, parameters, intent_name)
+
+        # Prepare output context for storing museum list data
+        
+    elif intent_name == "ShowAvailability":
+        # Handle selection of museum and date
+        return check_availability_by_museum_and_date(request,intent_name)
+
     else:
         return JsonResponse({'response': dialogflow_response_text})  # Default response for other intents
 
@@ -733,13 +806,15 @@ def find_museum_by_city(request, parameters,intent_name):
     print(city)
     if city:
         museum_url = request.build_absolute_uri(f'/api/museums/city/?city={city}')
-
+         
         try:
             museum_response = requests.get(museum_url)
+            
             if museum_response.status_code == 200:
                 museums = museum_response.json()
+                print(museums)
                 if museums:
-                   return JsonResponse({'response': museums,'intent':intent_name})
+                   return JsonResponse({'response': museums,'intent':intent_name,})
                 else:
                     return JsonResponse({'response': f"No museums found in {city}."}, status=404)
             else:
@@ -748,3 +823,39 @@ def find_museum_by_city(request, parameters,intent_name):
             return JsonResponse({'response': f"Error fetching museums: {str(e)}"}, status=500)
     else:
         return JsonResponse({'response': "Please specify a city to find museums."}, status=400)
+
+
+
+
+def check_availability_by_museum_and_date(request, intent_name):
+    # Extract selected museum ID and booking date from parameters
+    museumId = request.data.get('musuemId')
+    booking_date = request.data.get('message')
+    # print(museumId)
+    availability_data=None
+    try:
+       
+        
+        print(museumId)
+        availability_url = request.build_absolute_uri('/api/findbydate/')
+        request_body = {
+            'museum_id': museumId,
+            'date': booking_date  
+        }
+        availability_response = requests.post(availability_url,json=request_body)
+        if availability_response.status_code == 200:
+            availability_data = availability_response.json()
+            
+        else:
+            availability_message = "Unable to fetch availability status at this time."
+    except requests.RequestException as e:
+        availability_message = f"Error fetching availability: {str(e)}"
+
+    # Return the availability status as a response
+    return JsonResponse({
+        'response': availability_message if availability_data is None else availability_data,
+        'intent': intent_name
+    })
+
+    
+    
