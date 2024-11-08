@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
-const Booking = ({ order, bookingDetail, museumDetails }) => {
+const apiUrl = process.env.REACT_APP_API_URL;
+const Booking = ({ order, bookingDetail, museumDetails,onresetChat }) => {
   const { email, amount, id } = order;
   const [loading, setLoading] = useState(false);
   const [message, setmessage] = useState("");
-
+  console.log(bookingDetail);
+  console.log(museumDetails.museum_id);
+  
+  
   // Handle Razorpay payment logic
   const handlePayment = async () => {
     
@@ -37,12 +40,12 @@ const Booking = ({ order, bookingDetail, museumDetails }) => {
           console.log("Email sending process started...");
           // Send booking confirmation email
           const emailResponse = await axios.post(
-            `${process.env.REACT_APP_API_URL}/send_mail/`,
+            `${apiUrl}/send_mail/`,
             {
-              email: email,
-              selectedShifts: bookingDetail,
-              fare: amount,
-              id: museumDetails.museum_id,
+              email:email,
+              selectedShifts:bookingDetail,
+              fare:amount,
+              id:museumDetails.museum_id,
             }
           );
 
@@ -70,13 +73,13 @@ const Booking = ({ order, bookingDetail, museumDetails }) => {
   return (
     <div>
       <h2>Booking for {museumDetails.name}</h2>
-      <p>Total Fare: ₹{amount / 100}</p>{" "}
-      <p>Booking for : {bookingDetail}</p>{" "}
-      {/* Convert back to rupees for display */}
+      <p>Total Fare: ₹{amount / 100}</p> <p>Booking for : {bookingDetail}</p>{" "}
       <div>
-        <button onClick={handlePayment} disabled={loading}>
-          {loading ? "Processing..." : "Proceed to Payment"}
-        </button>
+        {!loading && (
+          <button onClick={handlePayment}>Proceed to Payment</button>
+        )}
+        {loading && <p>Processing payment...</p>}{" "}
+        <button onClick={()=>onresetChat()}>Cancel</button>
       </div>
       {message && <div>{message}</div>}
     </div>

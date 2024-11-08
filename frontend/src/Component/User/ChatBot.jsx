@@ -20,7 +20,7 @@ const Chatboard = () => {
   const chatRef = useRef(null);
   const messagesContainerRef = useRef(null);
   const[museum,setMuseum]= useState(""); 
-  let finalBookingDetails = null;
+  const[finalBookingDetail,setfinalBookingDetail]=useState("");
   
   const getSessionId = () => {
     let sessionId = sessionStorage.getItem("sessionId");
@@ -49,7 +49,8 @@ const Chatboard = () => {
   };
   
   const handleFinalBooking = (selectedDate, selectedShift) => {
-    finalBookingDetails = `${selectedDate}-${selectedShift}`;
+    
+    setfinalBookingDetail(`${selectedDate}-${selectedShift.shift_type}`);
     
     if (selectedDate && selectedShift) {
      
@@ -156,20 +157,36 @@ const Chatboard = () => {
           ]);
           break;
         case "EmailIntent":
-          setMessages((prev) => [
-            ...prev,
-            {
-              component: (
-                <Booking
-                  order={botResponse}
-                  bookingDetail= {finalBookingDetails}
-                  museumDetails= {museum}
-                  
-                />
-              ),
-              sender: "bot",
-            },
-          ]);
+          if (botResponse.error) {
+            // If there's an error in the response, show an error message instead of the booking component.
+            setMessages((prev) => [
+              ...prev,
+              {
+                component: (
+                  <div>
+                    <p>Error in creating order. Please try again.</p>
+                  </div>
+                ),
+                sender: "bot",
+              },
+            ]);
+          } else {
+            // If no error, proceed with the booking component
+            setMessages((prev) => [
+              ...prev,
+              {
+                component: (
+                  <Booking
+                    order={botResponse} // order data from botResponse
+                    bookingDetail = {finalBookingDetail} // Booking details like shifts
+                    museumDetails={museum}
+                    onresetChat={resetChat} // Museum details
+                  />
+                ),
+                sender: "bot",
+              },
+            ]);
+          }
           break;
 
         default:

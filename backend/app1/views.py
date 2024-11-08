@@ -425,15 +425,7 @@ def verify_payment(request):
         except SignatureVerificationError:
             return Response({'error': 'Payment signature verification failed'}, status=400)
 
-        # Step 4: After successful verification, proceed with post-payment logic
-        # You can confirm the booking, send an email, save payment details, etc.
-        
-        # Example: Save the payment to the database (you need to have a Payment model)
-        # Payment.objects.create(
-        #     razorpay_payment_id=razorpay_payment_id,
-        #     razorpay_order_id=razorpay_order_id,
-        #     status="Success"
-        # )
+
 
         return Response({'status': 'Payment verified', 'payment_id': razorpay_payment_id})
 
@@ -903,6 +895,8 @@ def handle_email_intent(request, intent_name, email):
     })
     else:
         return JsonResponse({
-            'response': 'Error in creating order. Please try again.',
+            'response': {
+               'error':'Error processing Payment.Enter Email again.',
+            },
             'intent': intent_name
         })
