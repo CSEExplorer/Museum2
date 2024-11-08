@@ -2,7 +2,7 @@ import React from "react";
 
 // MuseumIntent component
 const MuseumIntent = ({ museums,onBookClick }) => {
-console.log(museums);
+// console.log(museums);
   return (
     <div style={styles.museumContainer}>
       <h2 style={styles.museumTitle}>Museums Available:</h2>
@@ -22,7 +22,7 @@ console.log(museums);
               </button>
               <button
                 style={styles.Book}
-                onClick={() => onBookClick(museum.name,museum.museum_id)} // Handle the explore action
+                onClick={() => onBookClick(museum)} // Handle the explore action
               >
                 Book Now !
               </button>

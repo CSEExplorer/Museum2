@@ -477,7 +477,7 @@ def confirm_booking_status(request):
                 user=user,
                 museum=museum,
                 date_of_visit=timezone.now().date(),  # Adjust if needed
-                number_of_tickets=len(selectedShifts)
+               
             )
             booking.save()
 
@@ -722,9 +722,7 @@ from datetime import datetime
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def dialogflow_webhook(request):
-    print(request.data);
-  
-    user = request.user  # Get the logged-in user object
+    user = request.user  
     user_name = user.username if user.is_authenticated else 'Guest'
     user_message = request.data.get('message')
     
@@ -740,7 +738,7 @@ def dialogflow_webhook(request):
         )
     except Exception as e:
         return Response({'error': f'Could not load credentials: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    # print(dialogflow_credentials)
+    
     session_client = dialogflow.SessionsClient(credentials=dialogflow_credentials)
     session = session_client.session_path(project_id, session_id)
 
@@ -750,10 +748,8 @@ def dialogflow_webhook(request):
     response = session_client.detect_intent(session=session, query_input=query_input)
     dialogflow_response_text = response.query_result.fulfillment_text
     intent_name = response.query_result.intent.display_name
-    # contexts = response.query_result.output_contexts
-    # print(intent_name)
     parameters = response.query_result.parameters
-    # print(parameters);
+    
 
 
     if intent_name == "WelcomeIntent":
@@ -769,11 +765,16 @@ def dialogflow_webhook(request):
     elif intent_name == "FindMuseumByCity":
         return  find_museum_by_city(request, parameters, intent_name)
 
-        # Prepare output context for storing museum list data
+     
         
     elif intent_name == "ShowAvailability":
         # Handle selection of museum and date
         return check_availability_by_museum_and_date(request,intent_name)
+    
+    elif intent_name == "EmailIntent":
+        # Extract email from parameters if available
+        email = parameters.get('email', '')
+        return handle_email_intent(request, intent_name, email)
 
     else:
         return JsonResponse({'response': dialogflow_response_text})  # Default response for other intents
@@ -803,7 +804,7 @@ def profile_intent(request,intent_name):
 
 def find_museum_by_city(request, parameters,intent_name):
     city = parameters.get('city')
-    print(city)
+    print(city);
     if city:
         museum_url = request.build_absolute_uri(f'/api/museums/city/?city={city}')
          
@@ -812,7 +813,7 @@ def find_museum_by_city(request, parameters,intent_name):
             
             if museum_response.status_code == 200:
                 museums = museum_response.json()
-                print(museums)
+                # print(museums);
                 if museums:
                    return JsonResponse({'response': museums,'intent':intent_name,})
                 else:
@@ -826,36 +827,82 @@ def find_museum_by_city(request, parameters,intent_name):
 
 
 
-
 def check_availability_by_museum_and_date(request, intent_name):
-    # Extract selected museum ID and booking date from parameters
-    museumId = request.data.get('musuemId')
-    booking_date = request.data.get('message')
-    # print(museumId)
-    availability_data=None
-    try:
-       
-        
-        print(museumId)
-        availability_url = request.build_absolute_uri('/api/findbydate/')
-        request_body = {
-            'museum_id': museumId,
-            'date': booking_date  
-        }
-        availability_response = requests.post(availability_url,json=request_body)
-        if availability_response.status_code == 200:
-            availability_data = availability_response.json()
-            
-        else:
-            availability_message = "Unable to fetch availability status at this time."
-    except requests.RequestException as e:
-        availability_message = f"Error fetching availability: {str(e)}"
+    # Extract museum details and booking date from the request
+    museum_details = request.data.get('musuem')  # Full museum details passed with the request
+    booking_date = request.data.get('message')  # Booking date passed as message
 
-    # Return the availability status as a response
-    return JsonResponse({
-        'response': availability_message if availability_data is None else availability_data,
+    # Find the availability data for the given date within museum_details
+    availability_data = None
+    
+    if 'availabilities' in museum_details:
+        # Look for the availability data for the requested booking date
+        for availability in museum_details['availabilities']:
+            if availability['date'] == booking_date:
+                availability_data = availability  # Found matching date
+                break
+    
+    # If availability data is found, prepare structured response
+    if availability_data:
+        availability_response = {
+            "date": booking_date,
+            "shifts": [
+                {
+                    "shift_type": shift['shift_type'],
+                    "tickets_available": shift['tickets_available']
+                }
+                for shift in availability_data.get('shifts', [])
+            ]
+        }
+        print(availability_response);
+        # Return the structured availability data as a JSON response
+        return JsonResponse({
+            'response': availability_response,  # Send the structured data
+            'intent': intent_name
+        })
+    else:
+        # Return empty shifts if no availability data is found for the date
+        return JsonResponse({
+            'response': {
+                "date": booking_date,
+                "shifts": []  # Empty shifts if no availability found
+            },
+            'intent': intent_name
+        })
+
+    
+def handle_email_intent(request, intent_name, email):
+    print(request.data.get('musuem'));
+    amount =request.data.get('musuem').get('fare')
+    museum_id=request.data.get('musuem').get('museum_id')
+   
+
+    order_data={
+        'amount':amount*100,
+        'email':email
+    }
+    
+    # razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+    
+    create_order_url = request.build_absolute_uri(f'/api/museums/{museum_id}/create_order/')
+    print(create_order_url);
+    response = requests.post(create_order_url, json=order_data)
+
+    if response.status_code == 200:
+        payment_gateway_info = response.json()
+        order_id = payment_gateway_info.get('id')  # Assuming 'id' is the key for order ID
+        amount = payment_gateway_info.get('amount')  # Assuming 'amount' is the key for the amount
+        print(payment_gateway_info) 
+        return JsonResponse({
+        'response': {
+            'id': order_id,
+            'amount': amount,
+            'email':email
+        },
         'intent': intent_name
     })
-
-    
-    
+    else:
+        return JsonResponse({
+            'response': 'Error in creating order. Please try again.',
+            'intent': intent_name
+        })

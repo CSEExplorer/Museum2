@@ -1,26 +1,87 @@
-// ActionButtons.jsx
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-const ActionButtons = ({ onCancelBooking, onBookNow }) => {
+const Booking = ({ order, bookingDetail, museumDetails }) => {
+  const { email, amount, id } = order;
+  const [loading, setLoading] = useState(false);
+  const [message, setmessage] = useState("");
+
+  // Handle Razorpay payment logic
+  const handlePayment = async () => {
+    
+    if (typeof window.Razorpay === "undefined") {
+      alert(
+        "Razorpay SDK is not loaded. Please check your connection or script inclusion."
+      );
+      return;
+    }
+
+    const options = {
+      key: process.env.REACT_APP_RAZORPAY_KEY, // Razorpay Key ID from .env
+      amount: amount, // Amount in paise
+      currency: "INR",
+      name: museumDetails.name,
+      description: "Museum Ticket Booking",
+      order_id: id,
+      handler: async (response) => {
+        try {
+          // After successful payment, verify payment
+          await axios.post(`${process.env.REACT_APP_API_URL}/verify_payment/`, {
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature,
+            email: email, // Include email to send booking confirmation
+          });
+
+          console.log("Email sending process started...");
+          // Send booking confirmation email
+          const emailResponse = await axios.post(
+            `${process.env.REACT_APP_API_URL}/send_mail/`,
+            {
+              email: email,
+              selectedShifts: bookingDetail,
+              fare: amount,
+              id: museumDetails.museum_id,
+            }
+          );
+
+          console.log("Email sent response:", emailResponse.data);
+          setmessage("Email Sent Sucessfully ");
+          alert("Payment successful! Booking confirmed.");
+        } catch (error) {
+          // Log the error response
+          console.error("Error during payment processing:", error);
+        }
+      },
+      prefill: {
+        email: email,
+        contact: "9999999999", // Example contact, can be dynamically set
+      },
+      theme: {
+        color: "#3399cc",
+      },
+    };
+
+    const rzp1 = new window.Razorpay(options);
+    rzp1.open();
+  };
+
   return (
-    <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
-      <button onClick={onCancelBooking} style={buttonStyles}>
-        Cancel Booking
-      </button>
-      <button onClick={onBookNow} style={buttonStyles}>
-        Book Now.
-      </button>
+    <div>
+      <h2>Booking for {museumDetails.name}</h2>
+      <p>Total Fare: ₹{amount / 100}</p>{" "}
+      <p>Booking for : {bookingDetail}</p>{" "}
+      {/* Convert back to rupees for display */}
+      <div>
+        <button onClick={handlePayment} disabled={loading}>
+          {loading ? "Processing..." : "Proceed to Payment"}
+        </button>
+      </div>
+      {message && <div>{message}</div>}
     </div>
   );
 };
 
-const buttonStyles = {
-  padding: "10px 15px",
-  backgroundColor: "#007bff",
-  color: "white",
-  border: "none",
-  borderRadius: "5px",
-  cursor: "pointer",
-};
 
-export default ActionButtons;
+export default Booking;

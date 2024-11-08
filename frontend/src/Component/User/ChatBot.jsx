@@ -9,17 +9,19 @@ import WelcomeIntent from "../../ChatBot/WelcomeIntent";
 import ProfileIntent from "../../ChatBot/ProfileIntent";
 import MuseumIntent from "../../ChatBot/MuseumIntent";
 import ShowAvailability from "../../ChatBot/ShowAvailability"
-import ActionButtons from "../../ChatBot/Booking";
+import Booking from "../../ChatBot/Booking";
 const Chatboard = () => {
-  const[museumDetails,setMuseumDetails]=useState("");
-  // console.log("hii",museumDetails);
+  
+  
   const { isAuthenticated } = useContext(AuthContext);
   const [messages, setMessages] = useState([]);
   const [userInput, setUserInput] = useState("");
   const [isOpen, setIsOpen] = useState(true);
   const chatRef = useRef(null);
-   const messagesContainerRef = useRef(null);
-  const[museumId,setMuseumId]= useState(""); 
+  const messagesContainerRef = useRef(null);
+  const[museum,setMuseum]= useState(""); 
+  let finalBookingDetails = null;
+  
   const getSessionId = () => {
     let sessionId = sessionStorage.getItem("sessionId");
     if (!sessionId) {
@@ -29,30 +31,65 @@ const Chatboard = () => {
     return sessionId;
   };
 
-  const handleBookClick = (name,museum_id) => {
-    setMuseumId(museum_id);
+    const resetChat = () => {
+    setMessages([]);
+    setMuseum("");
+    setUserInput("");
+  };
+
+  const handleBookClick = (museum) => {
+    setMuseum(museum);
     setMessages((prev) => [
       ...prev,
       {
-        text:'Enter Date ->(YYYY-MM-DD)',
+        text:'Enter Date',
         sender: "bot",
       },
     ]);
   };
+  
+  const handleFinalBooking = (selectedDate, selectedShift) => {
+    finalBookingDetails = `${selectedDate}-${selectedShift}`;
+    
+    if (selectedDate && selectedShift) {
+     
+
+   
+      setMessages((prev) => [
+        ...prev,
+        {
+          text: `Enter Your Email address`,
+          sender: "bot",
+        },
+      ]);
+    } else {
+      // Handle cases where either selectedDate or selectedShift is missing
+      setMessages((prev) => [
+        ...prev,
+        {
+          text: "Please select a valid date and shift.",
+          sender: "bot",
+        },
+      ]);
+    }
+  };
+
 
   const handleSendMessage = async () => {
     setMessages((prev) => [...prev, { text: userInput, sender: "user" }]);
     try {
       const sessionId = getSessionId();
       const token = localStorage.getItem("token");
+      const payload = {
+         message: userInput,
+         sessionId: sessionId,
+         musuem: museum,
+       };
+
 
       const response = await axios.post(
         `${apiUrl}/dialogflow_webhook/`,
-        {
-          message: userInput,
-          sessionId: sessionId,
-          musuemId:museumId,
-        },
+        payload,
         {
           headers: {
             "Content-Type": "application/json",
@@ -64,6 +101,7 @@ const Chatboard = () => {
       const data = response.data;
       console.log(data);
       const { intent, response: botResponse } = data;
+      console.log(botResponse);
 
 
       switch (intent) {
@@ -89,8 +127,6 @@ const Chatboard = () => {
           break;
 
         case "FindMuseumByCity":
-          
-          setMuseumDetails(data.response);
           setMessages((prev) => [
             ...prev,
             {
@@ -103,45 +139,39 @@ const Chatboard = () => {
               sender: "bot",
             },
           ]);
-          
+
           break;
         case "ShowAvailability":
           setMessages((prev) => [
             ...prev,
             {
-              component: <ShowAvailability availabilityData={botResponse} />,
-
-              sender: "bot",
-            },
-            {
               component: (
-                <ActionButtons
-                  onCancelBooking={() => {
-                    setMuseumDetails("");
-                    setMessages((prev) => [
-                      ...prev,
-                      {
-                        text: "You chose to cancel the booking.",
-                        sender: "bot",
-                      },
-                    ]);
-                  }}
-                  onBookNow={() => {
-                    setMessages((prev) => [
-                      ...prev,
-                      {
-                        text: "which Shift  and How many Tickets(Max:3)  ? [shift-ticket]",
-                        sender: "bot",
-                      },
-                    ]);
-                  }}
+                <ShowAvailability
+                  availabilityData={botResponse}
+                  onFinalBooking={handleFinalBooking}
                 />
               ),
               sender: "bot",
             },
           ]);
           break;
-          
+        case "EmailIntent":
+          setMessages((prev) => [
+            ...prev,
+            {
+              component: (
+                <Booking
+                  order={botResponse}
+                  bookingDetail= {finalBookingDetails}
+                  museumDetails= {museum}
+                  
+                />
+              ),
+              sender: "bot",
+            },
+          ]);
+          break;
+
         default:
           setMessages((prev) => [
             ...prev,
@@ -150,7 +180,7 @@ const Chatboard = () => {
           break;
       }
 
-      // setMessages((prev) => [...prev, { text: userInput, sender: "user" }]);
+      
       setUserInput("");
     } catch (error) {
       console.error("Error sending message:", error);
@@ -183,7 +213,7 @@ const Chatboard = () => {
 
   if (!isOpen) {
     return (
-      <button onClick={() => setIsOpen(true)} style={styles.openChatButton}>
+      <button onClick={() => {setIsOpen(true); resetChat();}} style={styles.openChatButton}>
         <img src={chatIcon} alt="Open Chat" style={styles.chatButtonImage} />
       </button>
     );
@@ -215,6 +245,7 @@ const Chatboard = () => {
           Send
         </button>
       </div>
+     
     </div>
   );
 };
