@@ -11,6 +11,8 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
 
   const containerStyle = {
     maxWidth: "400px",
@@ -44,12 +46,17 @@ const Login = () => {
         username: email,
         password: password,
       });
+      setToastMessage("Login Sucessfull. Redirecting to Home page...");
+      console.log("hii");
+      setShowToast(true);
       console.log("Login successful:", response.data);
       login(response.data.token)
-
-      navigate("/");
-    } catch (error) {
+      setTimeout(() => navigate("/"), 1000);
+    } 
+    catch (error) {
       console.error("Login failed:", error.response.data);
+      setToastMessage("Login failed");
+      setShowToast(true);
       setError("Invalid email or password");
     }
   };
@@ -107,6 +114,37 @@ const Login = () => {
           Login
         </button>
       </form>
+
+      <div
+        className={`toast position-fixed top-0 start-50 translate-middle-x mt-3 ${
+          showToast ? "show" : "hide"
+        }`}
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true"
+        data-bs-autohide="true"
+        style={{
+          backgroundColor: "#007bff", // Blue color background
+          color: "white", // White text for contrast
+          whiteSpace: "nowrap", // Prevents text from wrapping
+          padding: "10px 20px",
+          borderRadius: "5px",
+          boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.2)",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <strong className="me-auto" style={{ marginRight: "auto" }}>
+            {toastMessage}
+          </strong>
+          <button
+            type="button"
+            className="btn-close btn-close-white"
+            onClick={() => setShowToast(false)}
+            style={{ marginLeft: "10px" }}
+          ></button>
+        </div>
+      </div>
+
       <div className="text-center mt-3">
         <p>Or</p>
         <Link

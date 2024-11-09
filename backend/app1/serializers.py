@@ -39,11 +39,12 @@ User = get_user_model()
 class SignUpSerializer(serializers.ModelSerializer):
     phone_number = serializers.CharField(required=True, max_length=15, validators=[RegexValidator(r'^\+?1?\d{9,15}$')])
     address = serializers.CharField(required=False, max_length=300)
-    city = serializers.CharField(required=True, max_length=100)
-    state = serializers.CharField(required=True, max_length=100)
+    first_name=serializers.CharField(required=True,max_length=10)
+    last_name=serializers.CharField(required=False,max_length=10)
+    
     class Meta:
         model = User
-        fields = ['username', 'email', 'password', 'phone_number', 'address', 'city', 'state']
+        fields = ['username','first_name' ,'last_name','email', 'password', 'phone_number', 'address']
         extra_kwargs = {'password': {'write_only': True}}
 
     def validate_email(self, value):
@@ -74,12 +75,13 @@ class SignUpSerializer(serializers.ModelSerializer):
         # Extract profile fields
         phone_number = validated_data.pop('phone_number')
         address = validated_data.pop('address')
-        city = validated_data.pop('city')
-        state = validated_data.pop('state')
+       
         
         # Create the user
         user = User.objects.create_user(
             username=validated_data['username'],
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name'],
             email=validated_data['email'],
             password=validated_data['password']
         )
@@ -89,8 +91,6 @@ class SignUpSerializer(serializers.ModelSerializer):
             user=user,
             phone_number=phone_number,
             address=address,
-            city=city,
-            state=state
         )
         
         return user

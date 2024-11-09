@@ -88,7 +88,34 @@ def logout_view(request):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
     
+# --------------------------------------------Chech Username----------------------------------------------------------------------
 
+from django.http import JsonResponse
+from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import get_user_model
+User = get_user_model()
+@csrf_exempt
+def check_username(request):
+    data = json.loads(request.body)
+    username = data.get('username')
+    print(username);
+    is_available = User.objects.filter(username=username).exists()
+    return JsonResponse({'isAvailable': is_available})
+# ----------------------------------------Check email-----------------------------------------------------------------------------
+from django.http import JsonResponse
+from django.contrib.auth.models import User
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import get_user_model
+User = get_user_model()
+@csrf_exempt
+def check_email(request):
+    data = json.loads(request.body)
+    print(data);
+    email = data.get('email')
+    print(email);
+    is_available = User.objects.filter(email=email).exists()
+    return JsonResponse({'isAvailable': is_available})
 
 
 
@@ -108,7 +135,7 @@ from .utils import upload_file_to_gcs
 @permission_classes([IsAuthenticated])
 def get_user_profile(request):
     try:
-        # Fetch user profile based on authenticated user
+       
         profile = UserProfile.objects.get(user=request.user)
     except UserProfile.DoesNotExist:
         return Response({'detail': 'Profile not found.'}, status=404)
@@ -715,7 +742,7 @@ from datetime import datetime
 @permission_classes([AllowAny])
 def dialogflow_webhook(request):
     user = request.user  
-    user_name = user.username if user.is_authenticated else 'Guest'
+    user_name = user.first_name if user.is_authenticated else 'Guest'
     user_message = request.data.get('message')
     
     if not user_message:

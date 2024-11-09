@@ -1,6 +1,6 @@
 from . import views
 from django.urls import path,include
-from .views import signup,logout_view,get_user_profile,login_view_simple,verify_otp,send_otp,dialogflow_webhook,check_availability_by_date
+from .views import signup,logout_view,get_user_profile,login_view_simple,verify_otp,send_otp,dialogflow_webhook,check_availability_by_date,check_username,check_email
 from .views import museum_list,book_ticket,get_museum_shifts,verify_payment,create_order,confirm_booking_status,AvailabilityByMonthView,password_reset_request,password_reset_confirm
 
 
@@ -8,6 +8,8 @@ from .views import museum_list,book_ticket,get_museum_shifts,verify_payment,crea
 
 
 urlpatterns=[
+    path('api/check_email/',check_email,name='check_email'),
+    path('api/check_username/',check_username,name='check_username'),
     path('api/signup/', signup, name='signup'),
     path('api/logout/', logout_view, name='logout'),
     path('api/user/profile/', get_user_profile, name='get_user_profile'),
