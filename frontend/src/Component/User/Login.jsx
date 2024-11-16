@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 const apiUrl = process.env.REACT_APP_API_URL;
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../contexts/AuthContext";
+import { GoogleLogin } from "@react-oauth/google";
 
 const Login = () => {
    const { login } = useContext(AuthContext);
@@ -37,6 +38,38 @@ const Login = () => {
   const buttonHoverStyle = {
     backgroundColor: "#0056b3",
   };
+  
+const handleLogin = async (response) => {
+  const googleToken = response.credential; 
+
+  try {
+    // Send the token to your Django backend to authenticate and verify
+    const res = await axios.post(`${apiUrl}/google-login/`, {
+      token: googleToken, // Send the token to the backend
+    });
+
+    if (res.status === 200) {
+      setToastMessage("Login Sucessfull. Redirecting to Home page...");
+      setShowToast(true);
+      login(res.data.token);
+      localStorage.setItem("profile_image_url", res.data.profile_picture);
+      
+      setTimeout(() => navigate("/"), 1000);
+      console.log("User authenticated:", res.data);
+      
+    } else {
+      throw new Error("Google login failed on the backend");
+    }
+  } catch (error) {
+    console.error("Google login error:", error.response?.data || error.message);
+  }
+};
+
+    const handleError = () => {
+      setToastMessage("Google Login failed");
+      setShowToast(true);
+      console.error("Google Login Failed");
+    };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -47,9 +80,9 @@ const Login = () => {
         password: password,
       });
       setToastMessage("Login Sucessfull. Redirecting to Home page...");
-      console.log("hii");
+      
       setShowToast(true);
-      console.log("Login successful:", response.data);
+      
       login(response.data.token)
       setTimeout(() => navigate("/"), 1000);
     } 
@@ -153,6 +186,13 @@ const Login = () => {
         >
           Login with OTP
         </Link>
+      </div>
+      <div className="text-center mt-3">
+        <p>Or</p>
+        <GoogleLogin
+          onSuccess={handleLogin}
+          onError={handleError}
+        />
       </div>
     </div>
   );

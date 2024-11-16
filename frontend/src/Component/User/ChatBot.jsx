@@ -42,7 +42,7 @@ const Chatboard = () => {
     setMessages((prev) => [
       ...prev,
       {
-        text:'Enter Date',
+        text:'Enter Date(YYYY-MM-DD)',
         sender: "bot",
       },
     ]);

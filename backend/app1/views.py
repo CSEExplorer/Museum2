@@ -27,46 +27,87 @@ def signup(request):
                 return JsonResponse({'error': str(e)}, status=400)
         else:
             return JsonResponse({'errors': serializer.errors}, status=400)
+        
 
-
-# ---------------------------------------------LOGIN --------------------------------------------------------------------
-
-from django.contrib.auth.models import User
+# --------------------------------------------------GOOGLE LOGIN VIEW-----------------------------------------------------------------------------
+from django.shortcuts import render
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from google.oauth2 import id_token
+from google.auth.transport.requests import Request
+from django.conf import settings
+from rest_framework.permissions import AllowAny
+from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
-from rest_framework import status
- 
-@csrf_exempt
-def login_view_normal(request):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            email = data.get('username')  # Using email as the username
-            password = data.get('password')
-            if not User.objects.filter(email=email).exists():
-                return Response({'error': 'Email does not exist'}, status=status.HTTP_400_BAD_REQUEST)
-            
-            try:
-                user = User.objects.get(email=email)
-            except User.DoesNotExist:
-                return JsonResponse({'error': 'Invalid credentials'}, status=400)
+import requests
+from .models import UserProfile
 
-            # Authenticate with username (or email) and password
-            user = authenticate(request, username=user.username, password=password)
-            if user is not None:
-                login(request, user)
-                # Generate or get the token for the user
-                token, created = Token.objects.get_or_create(user=user)
-                return JsonResponse({'message': 'Login successful!', 'token': token.key}, status=200)
-            else:
-                return JsonResponse({'error': 'Invalid credentials'}, status=400)
-        except json.JSONDecodeError:
-            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+User = get_user_model()
+
+class GoogleLoginView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        token = request.data.get('token')
+
+        try:
+            
+            id_info = id_token.verify_oauth2_token(token, Request(), settings.GOOGLE_CLIENT_ID)
+
+           
+            google_user_id = id_info.get('sub')
+
+            email = id_info.get('email')
+            full_name = id_info.get('name')
+            picture = id_info.get('picture')
+            
+          
+            name_parts = full_name.split(' ')
+            print(name_parts);
+            first_name = name_parts[0]  # First part is the first name
+            last_name = ' '.join(name_parts[1:]) if len(name_parts) > 1 else '' 
+
+            # Get or create user
+            user, created = User.objects.get_or_create(
+                email=email,
+                defaults={
+                    'first_name': first_name, 
+                    'last_name': last_name,
+                }
+                )
+
+           
+            token, created = Token.objects.get_or_create(user=user)
+            profile, profile_created = UserProfile.objects.get_or_create(
+                user=user
+            )
+          
+            # Update profile fields if already exists
+            if not profile_created:
+                profile.username = user
+                profile.save()
+           
+            return Response({
+                    'token': token.key,
+                    'email': email,
+                    'fullname': full_name,
+                    'profile_picture': picture,
+                   
+                })
+
+            return Response({'error': 'Failed to update profile'}, status=profile_response.status_code)
+
+        
+          
+         
+            
+            
+        
+        except ValueError:
+            return Response({'error': 'Invalid token'}, status=400)
+        
         except Exception as e:
-            # Log the error to the server logs
-            print(f"Unexpected error: {str(e)}")
-            return JsonResponse({'error': 'Something went wrong. Please try again.'}, status=500)
-    else:
-        return JsonResponse({'error': 'Invalid request method'}, status=405)
+            return Response({'error': f'Error processing the request: {str(e)}'}, status=500)
 
 # ---------------------------------------------SIGN OUT--------------------------------------------------------------------
 
@@ -88,6 +129,10 @@ def logout_view(request):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=405)
     
+    
+
+
+
 # --------------------------------------------Chech Username----------------------------------------------------------------------
 
 from django.http import JsonResponse
@@ -102,6 +147,9 @@ def check_username(request):
     print(username);
     is_available = User.objects.filter(username=username).exists()
     return JsonResponse({'isAvailable': is_available})
+
+
+
 # ----------------------------------------Check email-----------------------------------------------------------------------------
 from django.http import JsonResponse
 from django.contrib.auth.models import User
@@ -152,6 +200,7 @@ def get_user_profile(request):
         print("Incoming data:", request.data)
         
         if 'profile_image' in request.FILES:
+               
                 file_obj = request.FILES['profile_image']
                 
                 # Define the destination blob name (path) in the GCS bucket

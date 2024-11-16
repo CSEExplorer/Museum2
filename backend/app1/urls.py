@@ -1,6 +1,6 @@
 from . import views
 from django.urls import path,include
-from .views import signup,logout_view,get_user_profile,login_view_simple,verify_otp,send_otp,dialogflow_webhook,check_availability_by_date,check_username,check_email
+from .views import signup,logout_view,get_user_profile,login_view_simple,verify_otp,send_otp,dialogflow_webhook,check_availability_by_date,check_username,check_email,GoogleLoginView
 from .views import museum_list,book_ticket,get_museum_shifts,verify_payment,create_order,confirm_booking_status,AvailabilityByMonthView,password_reset_request,password_reset_confirm
 
 
@@ -27,6 +27,7 @@ urlpatterns=[
     path('api/send_otp/',send_otp,name='send_otp'),
     path('api/findbydate/',check_availability_by_date,name='find'),
     # path('api/ChatBot/',chatbot_view,name='ChatBot'),
+    path('api/google-login/',GoogleLoginView.as_view(),name='google_login'),
     path('api/dialogflow_webhook/',dialogflow_webhook,name='dialogflow')
     
    
