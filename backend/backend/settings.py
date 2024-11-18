@@ -107,8 +107,8 @@ CSRF_COOKIE_NAME = 'csrftoken'  # Default
 # settings.py
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
-    'https://7895-2409-4050-2e3d-5b31-f51d-5311-7128-c1a3.ngrok-free.app'
-     'https://museumo.netlify.app/'
+    'https://7895-2409-4050-2e3d-5b31-f51d-5311-7128-c1a3.ngrok-free.app',
+     'https://museumo.netlify.app'
                         
     ]
 
