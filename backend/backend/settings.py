@@ -29,6 +29,7 @@ ALLOWED_HOSTS = [
     'localhost',  # Allow localhost for local development
     '127.0.0.1',  # Allow localhost IP
     'museum-rr68.onrender.com',
+    'museumo.netlify.app',
     '7895-2409-4050-2e3d-5b31-f51d-5311-7128-c1a3.ngrok-free.app'  # Add your Render domain
 ]
 
@@ -91,7 +92,9 @@ CORS_ALLOWED_ORIGINS = [
     "https://museum-rr68.onrender.com",
     "http://museum-rr68.onrender.com",
     "https://7895-2409-4050-2e3d-5b31-f51d-5311-7128-c1a3.ngrok-free.app",
-    "https://dialogflow.cloud.google.com"
+    "https://dialogflow.cloud.google.com",
+    "https://museumo.netlify.app"
+
       
 ]
 
@@ -105,7 +108,7 @@ CSRF_COOKIE_NAME = 'csrftoken'  # Default
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
     'https://7895-2409-4050-2e3d-5b31-f51d-5311-7128-c1a3.ngrok-free.app'
-
+     'https://museumo.netlify.app/'
                         
     ]
 
