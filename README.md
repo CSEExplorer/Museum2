@@ -1,6 +1,6 @@
-# 🎟️ Museum Ticketing Chatbot System
+# 🎟️ Online ChatBot based Ticketing Application
 
-A chatbot-based museum ticketing system built with **Django**, **DjangoRestFrameWork**,**React**, and **Dialogflow**. This system allows users to search for museums, check ticket availability, and book tickets seamlessly.
+A chatbot-based museum ticketing system built with **Django**, **DjangoRestFramework**,**React**, and **Dialogflow**. This system allows users to search for museums, check ticket availability, and book tickets seamlessly.
 
 ---
 
@@ -19,7 +19,7 @@ A chatbot-based museum ticketing system built with **Django**, **DjangoRestFrame
 - **Backend**: Django, Django REST Framework
 - **Frontend**: React.js
 - **Chatbot**: Dialogflow (Natural Language Processing)
-- **Database**: PostgreSQL
+- **Database**: DbSqlite
 - **Authentication**: String Token
 - **Payment Gateway**: Razorpay 
 
@@ -32,7 +32,7 @@ Before setting up the project, ensure you have the following installed:
 
 ✅ **Python (Required for Django Backend)**  
 Check if Python is installed:  
-```CMD
+```bash
 python --version
 ```
 
